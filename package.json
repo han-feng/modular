@@ -1,0 +1,26 @@
+{
+  "name": "@modular/core",
+  "version": "0.1.0",
+  "description": "JavaScript application modular support",
+  "main": "./dist/index.js",
+  "author": "Han Feng <han_feng@foxmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/han-feng/modular.git"
+  },
+  "scripts": {
+    "build": "babel src --out-dir dist",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.3"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}

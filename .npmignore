@@ -1,3 +1,5 @@
 src
 test
 .vscode
+
+babel.config.js

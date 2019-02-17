@@ -1,7 +1,8 @@
 {
-  "name": "@modular/core",
+  "name": "modular-core",
   "version": "0.1.0",
   "description": "JavaScript application modular support",
+  "private": false,
   "main": "./dist/index.js",
   "author": "Han Feng <han_feng@foxmail.com>",
   "license": "MIT",

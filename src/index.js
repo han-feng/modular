@@ -24,8 +24,10 @@ export default class Modular {
     // 解析依赖，模块排序
     const sortModules = []
     sortModules.push(nameMapping['modular-core'])
+
     function fillDepens (item) {
       if (sortModules.find(m => m.name === item.name)) {
+        // FIXME 循环查找，存在性能问题
         return true
       }
       if (item.dependencies && item.dependencies.length) {
@@ -34,10 +36,11 @@ export default class Modular {
         for (let i = 0; i < len; i++) {
           const d = ds[i]
           if (sortModules.find(m => m.name === d) === undefined) {
+            // FIXME 循环查找，存在性能问题
+            // 依赖模块未解析
             if (nameMapping[d]) {
               if (fillDepens(nameMapping[d])) {
-                // 依赖项都已加载
-                sortModules.push(item)
+                // 依赖项加载成功
                 continue
               } else {
                 console.log('“' + item.name + '”依赖的模块“' + d + '”解析失败')
@@ -49,10 +52,9 @@ export default class Modular {
             }
           }
         }
-      } else {
-        // 无依赖项
-        sortModules.push(item)
+        // 依赖项全部加载成功
       }
+      sortModules.push(item)
       return true
     }
     modules.forEach(module => {

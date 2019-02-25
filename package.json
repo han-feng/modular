@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "JavaScript application modular support",
   "main": "./dist/index.js",
   "author": "Han Feng <han_feng@foxmail.com>",
@@ -17,10 +17,5 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  }
 }

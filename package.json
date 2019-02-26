@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "babel src --out-dir dist",
+    "lint": "eslint src/**",
     "prebuild": "rimraf dist/*",
     "prepublishOnly": "npm run build"
   },
@@ -18,6 +19,23 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.14.1",
+    "eslint-plugin-vue": "^5.2.2",
     "rimraf": "^2.6.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "@vue/standard"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
   }
 }

@@ -129,7 +129,7 @@ export default class Modular {
   }
   // 获取指定名称的模块配置
   getModule (name) {
-    return this._modules[name]
+    return this._modules.find(item => item.name === name)
   }
   // 获取全部模块配置
   getModules () {

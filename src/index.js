@@ -48,7 +48,7 @@ export default class Modular {
     // TODO 处理优先加载模块
     // modulesLoader.add(nameMapping['modular-core'])
 
-    function fillDepens (item) {
+    function fillDepens (item, cache = {}) {
       if (modulesLoader.contains(item)) {
         return true
       }
@@ -61,7 +61,13 @@ export default class Modular {
           if (!modulesLoader.contains(item)) {
             // 依赖模块未解析
             if (nameMapping[d]) {
-              if (fillDepens(nameMapping[d])) {
+              if (cache[d]) {
+                // 正在处理中的cache包含依赖项，说明出现循环依赖的情况，跳过
+                return true
+              }
+              cache[d] = nameMapping[d]
+              if (fillDepens(nameMapping[d], cache)) {
+                delete cache[d]
                 // 依赖项加载成功
                 continue
               } else {

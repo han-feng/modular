@@ -1,8 +1,9 @@
 import Modular from '@/index'
+import data from './modular.data'
 
 describe('Modular 单元测试', () => {
-  it('无参数 Modular 对象验证', () => {
-    let modular = new Modular()
+  it('默认构造函数测试', () => {
+    const modular = new Modular()
     const app = modular.getApplication()
     const app2 = modular.getModule('Application')
     const modules = modular.getModules()
@@ -27,5 +28,23 @@ describe('Modular 单元测试', () => {
     expect(modular.strict).toBe(false)
     // 上述执行过程无错误日志产生
     expect(modular.errors).toEqual([])
+  })
+
+  it('循环依赖测试', () => {
+    const modular = new Modular({
+      modules: [
+        data.m1,
+        data.m2,
+        data.m3
+      ]
+    })
+    expect(modular.getModules()).toEqual([data.m3, data.m2, data.m1, { name: 'Application' }])
+    modular.start()
+  })
+
+  it('扩展配置覆盖测试', () => {
+  })
+
+  it('异常信息记录测试', () => {
   })
 })

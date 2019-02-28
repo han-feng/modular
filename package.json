@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "JavaScript application modular support",
   "main": "./dist/index.js",
   "author": "Han Feng <han_feng@foxmail.com>",
@@ -58,6 +58,9 @@
     ],
     "collectCoverageFrom": [
       "<rootDir>/src/**/*.{js,json}"
+    ],
+    "coverageReporters": [
+      "lcov"
     ],
     "browser": true,
     "collectCoverage": true

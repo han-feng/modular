@@ -62,9 +62,6 @@
     "collectCoverageFrom": [
       "<rootDir>/src/**/*.{js,json}"
     ],
-    "coverageReporters": [
-      "lcov"
-    ],
     "browser": true,
     "collectCoverage": true
   }

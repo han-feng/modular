@@ -48,14 +48,29 @@ describe('Modular 单元测试', () => {
   it('异常信息记录测试', () => {
     const modular = new Modular({
       modules: cloneDeep([
+        data.m4,
         data.m1,
         data.m2,
         data.m1,
-        data.m3
+        data.m3,
+        data.m5,
+        data.m6,
+        data.m7
       ])
     })
     expect(modular.getLogs()).toEqual([
-      { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] }
+      { level: 'error', code: 'E01', message: '模块名称未定义', data: {} },
+      { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] },
+      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
+      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
+      { level: 'error', code: 'E03', message: '“m6”依赖的模块“m5”解析失败' },
+      { level: 'error', code: 'E04', message: '“m7”依赖的模块“m4”不存在' }
+    ])
+    expect(modular.getModules()).toEqual([
+      data.m3,
+      data.m2,
+      data.m1,
+      { name: 'Application' }
     ])
   })
 })

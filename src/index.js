@@ -62,6 +62,9 @@ export default class Modular {
     // modulesLoader.add(nameMapping['modular-core'])
     const self = this
     function fillDepens (item, cache = {}) {
+      if (item.name === undefined) {
+        return false
+      }
       if (modulesLoader.contains(item)) {
         return true
       }

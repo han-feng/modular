@@ -16,5 +16,26 @@ export default {
     dependencies: [
       'm1'
     ]
+  },
+  m4: {
+  },
+  m5: {
+    name: 'm5',
+    dependencies: [
+      'm0'
+    ]
+  },
+  m6: {
+    name: 'm6',
+    dependencies: [
+      'm5'
+    ]
+  },
+  m7: {
+    name: 'm7',
+    dependencies: [
+      'm4',
+      'm5'
+    ]
   }
 }

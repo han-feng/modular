@@ -25,18 +25,31 @@ export default class Modular {
     let app = config.application || {}
     app.name = app.name || 'Application'
     this.strict = !!config.strict // 严格模式，暂未使用，保留
-    this.errors = [] // 异常信息
+    this._logs = [] // 异常信息
 
     // 建立 name 查询索引
     const nameMapping = {}
     modules.forEach(module => {
       if (module.name === undefined) {
-        this._log('模块名称未定义', module)
+        this._log({
+          level: 'error',
+          code: 'E01',
+          message: '模块名称未定义',
+          data: module
+        })
         return
       }
       const name = module.name
       if (nameMapping[name]) {
-        this._log('模块名称重复', nameMapping[name], module)
+        this._log({
+          level: 'error',
+          code: 'E02',
+          message: '模块名称重复',
+          data: [
+            nameMapping[name],
+            module
+          ]
+        })
         return
       }
       nameMapping[name] = module
@@ -47,7 +60,7 @@ export default class Modular {
 
     // TODO 处理优先加载模块
     // modulesLoader.add(nameMapping['modular-core'])
-
+    const self = this
     function fillDepens (item, cache = {}) {
       if (modulesLoader.contains(item)) {
         return true
@@ -71,11 +84,19 @@ export default class Modular {
                 // 依赖项加载成功
                 continue
               } else {
-                this._log('“' + item.name + '”依赖的模块“' + d + '”解析失败')
+                self._log({
+                  level: 'error',
+                  code: 'E03',
+                  message: '“' + item.name + '”依赖的模块“' + d + '”解析失败'
+                })
                 return false
               }
             } else {
-              this._log('“' + item.name + '”依赖的模块“' + d + '”不存在')
+              self._log({
+                level: 'error',
+                code: 'E04',
+                message: '“' + item.name + '”依赖的模块“' + d + '”不存在'
+              })
               return false
             }
           }
@@ -104,7 +125,14 @@ export default class Modular {
         const ps = module.extensionPoints
         for (let key in ps) {
           if (points[key]) {
-            this._log('重复的 extensionPoint 定义 ' + key, points[key], module)
+            this._log({
+              level: 'error',
+              code: 'E05',
+              message: '重复的 extensionPoint 定义 ' + key,
+              data: [
+                points[key],
+                module]
+            })
           } else {
             points[key] = { module: module.name, config: ps[key] }
           }
@@ -118,7 +146,15 @@ export default class Modular {
             extens[key] = extens[key] || {}
             Object.assign(extens[key], ext[key])
           } else {
-            this._log('extensionPoint 定义不存在 ' + key, ext[key], module)
+            this._log({
+              level: 'error',
+              code: 'E06',
+              message: 'extensionPoint 定义不存在 ' + key,
+              data: [
+                ext[key],
+                module
+              ]
+            })
           }
         }
       }
@@ -157,9 +193,12 @@ export default class Modular {
       }
     })
   }
+  getLogs () {
+    return Object.freeze(this._logs)
+  }
   // 记录日志
-  _log () {
-    this.errors.push(arguments)
-    console.log(arguments)
+  _log (info) {
+    this._logs.push(info)
+    console.log(info)
   }
 }

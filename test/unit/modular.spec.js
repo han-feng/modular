@@ -1,5 +1,6 @@
 import Modular from '@/index'
 import data from './modular.data'
+import { cloneDeep } from 'lodash'
 
 describe('Modular 单元测试', () => {
   it('默认构造函数测试', () => {
@@ -27,24 +28,34 @@ describe('Modular 单元测试', () => {
     expect(points).toEqual({})
     expect(modular.strict).toBe(false)
     // 上述执行过程无错误日志产生
-    expect(modular.errors).toEqual([])
+    expect(modular.getLogs()).toEqual([])
   })
 
   it('循环依赖测试', () => {
     const modular = new Modular({
-      modules: [
+      modules: cloneDeep([
         data.m1,
         data.m2,
         data.m3
-      ]
+      ])
     })
     expect(modular.getModules()).toEqual([data.m3, data.m2, data.m1, { name: 'Application' }])
-    modular.start()
   })
 
   it('扩展配置覆盖测试', () => {
   })
 
   it('异常信息记录测试', () => {
+    const modular = new Modular({
+      modules: cloneDeep([
+        data.m1,
+        data.m2,
+        data.m1,
+        data.m3
+      ])
+    })
+    expect(modular.getLogs()).toEqual([
+      { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] }
+    ])
   })
 })

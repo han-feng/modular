@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "JavaScript application modular support",
   "main": "./dist/index.js",
   "files": [
@@ -16,6 +16,7 @@
     "build": "babel src --out-dir dist",
     "lint": "eslint src/**",
     "test": "jest",
+    "preinstall": "node script/sync-version.js",
     "prebuild": "rimraf dist/*",
     "prepublishOnly": "npm run build"
   },
@@ -27,6 +28,7 @@
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
+    "chalk": "^2.4.2",
     "eslint": "^5.14.1",
     "eslint-plugin-vue": "^5.2.2",
     "jest": "^24.1.0",

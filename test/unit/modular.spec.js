@@ -2,6 +2,8 @@ import Modular from '@/index'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
+const application = { name: 'Application' }
+
 describe('Modular 单元测试', () => {
   it('默认构造函数测试', () => {
     const modular = new Modular()
@@ -22,7 +24,7 @@ describe('Modular 单元测试', () => {
     expect(() => { delete app2.name }).toThrowError(TypeError)
     // 默认值测试
     expect(app).toBe(app2)
-    expect(app).toEqual({ name: 'Application' })
+    expect(app).toEqual(application)
     expect(modules).toEqual([app])
     expect(exts).toEqual({})
     expect(points).toEqual({})
@@ -39,14 +41,35 @@ describe('Modular 单元测试', () => {
         data.m3
       ])
     })
-    expect(modular.getModules()).toEqual([data.m3, data.m2, data.m1, { name: 'Application' }])
+    expect(modular.getModules()).toEqual([data.m3, data.m2, data.m1, application])
   })
 
   it('扩展配置覆盖测试', () => {
+    const modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
+    expect(modular.getModules()).toEqual([
+      data.m8,
+      data.m9,
+      data.m10,
+      application
+    ])
+    expect(modular.getExtensionPoints()).toEqual({
+      ep1: data.ep1,
+      ep2: data.ep2,
+      ep3: data.ep3,
+      ep4: data.ep4,
+      ep5: data.ep5
+    })
+    expect(modular.getExtensions()).toEqual({ ep1: { m9: 'm10->m9-ext1', m10: 'm10-ext1' } })
   })
 
-  it('异常信息记录测试', () => {
-    const modular = new Modular({
+  it('异常测试', () => {
+    let modular = new Modular({
       modules: cloneDeep([
         data.m4,
         data.m1,
@@ -70,7 +93,45 @@ describe('Modular 单元测试', () => {
       data.m3,
       data.m2,
       data.m1,
-      { name: 'Application' }
+      application
     ])
+
+    modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
+    expect(modular.getLogs()).toEqual([
+      { level: 'error', code: 'E05', message: '重复的 extensionPoint 定义 ep1', data: [{ module: 'm8', config: {} }, data.m9] },
+      { level: 'error', code: 'E06', message: 'extensionPoint 定义不存在 ep0', data: [{ m10: 'm10-ext0' }, data.m10] }
+    ])
+    expect(modular.getModules()).toEqual([
+      data.m8,
+      data.m9,
+      data.m10,
+      application
+    ])
+    expect(modular.getExtensionPoints()).toEqual({
+      ep1: data.ep1,
+      ep2: data.ep2,
+      ep3: data.ep3,
+      ep4: data.ep4,
+      ep5: data.ep5
+    })
+  })
+
+  it('start() 测试', () => {
+    const modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
+    data.activator.clean() // 清理测试记录
+    modular.start()
+    expect(data.activator.logs).toEqual(['m8', 'm9', 'm10'])
   })
 })

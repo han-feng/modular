@@ -184,15 +184,23 @@ export default class Modular {
   getExtension (name) {
     return this._extensions[name] || {}
   }
+  // 获取全部有效的扩展配置
+  getExtensions () {
+    return this._extensions
+  }
   // 获取指定名称的扩展点定义
   getExtensionPoint (name) {
     return this._extensionPoints[name] || {}
+  }
+  // 获取全部有效的扩展点定义
+  getExtensionPoints () {
+    return this._extensionPoints
   }
   // 启动模块化应用
   start () {
     this._modules.forEach(module => {
       if (module.activator && module.activator.start) {
-        module.activator.start(this)
+        module.activator.start(this, module)
       }
     })
   }
@@ -202,6 +210,6 @@ export default class Modular {
   // 记录日志
   _log (info) {
     this._logs.push(info)
-    console.log(info)
+    // console.log(info)
   }
 }

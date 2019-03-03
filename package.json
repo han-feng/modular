@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "JavaScript application modular support",
   "main": "./dist/index.js",
   "files": [
@@ -16,8 +16,7 @@
     "build": "babel src --out-dir dist",
     "lint": "eslint src/**",
     "test": "jest",
-    "preinstall": "node script/sync-version.js",
-    "prebuild": "rimraf dist/*",
+    "prebuild": "rimraf dist/* && node script/sync-version.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {},

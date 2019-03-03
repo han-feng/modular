@@ -74,34 +74,31 @@ export default class Modular {
         const len = ds.length
         for (let i = 0; i < len; i++) {
           const d = ds[i]
-          if (!modulesLoader.contains(item)) {
-            // 依赖模块未解析
-            if (nameMapping[d]) {
-              if (cache[d]) {
-                // 正在处理中的cache包含依赖项，说明出现循环依赖的情况，跳过
-                return true
-              }
-              cache[d] = nameMapping[d]
-              if (fillDepens(nameMapping[d], cache)) {
-                delete cache[d]
-                // 依赖项加载成功
-                continue
-              } else {
-                self._log({
-                  level: 'error',
-                  code: 'E03',
-                  message: '“' + item.name + '”依赖的模块“' + d + '”解析失败'
-                })
-                return false
-              }
+          if (nameMapping[d]) {
+            if (cache[d]) {
+              // 正在处理中的cache包含依赖项，说明出现循环依赖的情况，跳过
+              return true
+            }
+            cache[d] = nameMapping[d]
+            if (fillDepens(nameMapping[d], cache)) {
+              delete cache[d]
+              // 依赖项加载成功
+              continue
             } else {
               self._log({
                 level: 'error',
-                code: 'E04',
-                message: '“' + item.name + '”依赖的模块“' + d + '”不存在'
+                code: 'E03',
+                message: '“' + item.name + '”依赖的模块“' + d + '”解析失败'
               })
               return false
             }
+          } else {
+            self._log({
+              level: 'error',
+              code: 'E04',
+              message: '“' + item.name + '”依赖的模块“' + d + '”不存在'
+            })
+            return false
           }
         }
         // 依赖项全部加载成功

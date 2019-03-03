@@ -69,7 +69,7 @@ export default {
     },
     extensions: {
       'ep1': {
-        m9: 'm9-ext1'
+        m9: { name: 'm9-ext1' }
       }
     },
     activator
@@ -86,11 +86,14 @@ export default {
     },
     extensions: {
       'ep0': {
-        m10: 'm10-ext0'
+        m10: { name: 'm10-ext0' }
       },
       'ep1': {
-        m10: 'm10-ext1',
-        m9: 'm10->m9-ext1'
+        m10: { name: 'm10-ext1' },
+        m9: { name: 'm10->m9-ext1' }
+      },
+      'ep2': {
+        m10: { name: 'm10=ext2' }
       }
     },
     activator

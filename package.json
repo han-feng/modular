@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "JavaScript application modular support",
   "main": "./dist/index.js",
   "files": [
@@ -19,7 +19,9 @@
     "prebuild": "rimraf dist/* && node script/sync-version.js",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
@@ -31,7 +33,6 @@
     "eslint": "^5.15.0",
     "eslint-plugin-vue": "^5.2.2",
     "jest": "^24.1.0",
-    "lodash": "^4.17.11",
     "rimraf": "^2.6.3"
   },
   "eslintConfig": {
@@ -40,7 +41,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
+      "plugin:vue/strongly-recommended",
       "@vue/standard"
     ],
     "parserOptions": {

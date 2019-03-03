@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 class ModulesLoader {
   constructor () {
     this._modules = []
@@ -117,6 +119,7 @@ export default class Modular {
     // 组装扩展配置
     const points = {}
     const extens = {}
+    const extenConfigs = {}
     const len = modules.length
     for (let i = 0; i < len; i++) {
       let module = modules[i]
@@ -140,11 +143,23 @@ export default class Modular {
       }
       if (module.extensions) {
         module.extensions = Object.freeze(module.extensions)
-        const ext = module.extensions
+        const ext = cloneDeep(module.extensions)
         for (let key in ext) {
           if (points[key]) {
-            extens[key] = extens[key] || {}
-            Object.assign(extens[key], ext[key])
+            extens[key] = extens[key] || {} // 初始化key对应的配置对象
+            extenConfigs[key] = extenConfigs[key] || [] // 初始化key对应的配置数组
+            const oldConfig = extens[key]
+            const newConfig = ext[key]
+            for (let name in newConfig) {
+              // 遍历当前扩展配置子项
+              if (oldConfig[name]) {
+                // 被覆盖项目
+                oldConfig[name].valid = false
+              }
+              newConfig[name].valid = true
+              extenConfigs[key].push(newConfig[name])
+            }
+            Object.assign(extens[key], ext[key]) // 混合配置对象
           } else {
             this._log({
               level: 'error',
@@ -164,6 +179,7 @@ export default class Modular {
     this._modules = Object.freeze(modules)
     this._extensionPoints = Object.freeze(points)
     this._extensions = Object.freeze(extens)
+    this._extensionConfigs = Object.freeze(extenConfigs)
   }
   // 获取应用配置
   getApplication () {
@@ -177,9 +193,13 @@ export default class Modular {
   getModules () {
     return this._modules
   }
-  // 获取指定名称的扩展配置
+  // 获取指定名称的有效扩展配置
   getExtension (name) {
     return this._extensions[name] || {}
+  }
+  // 获取指定名称的全部扩展配置
+  getExtensionConfig (name) {
+    return this._extensionConfigs[name] || []
   }
   // 获取全部有效的扩展配置
   getExtensions () {

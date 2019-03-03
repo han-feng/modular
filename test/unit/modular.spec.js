@@ -11,11 +11,13 @@ describe('Modular 单元测试', () => {
     const app2 = modular.getModule('Application')
     const modules = modular.getModules()
     const exts = modular.getExtension('test')
+    const extConfig = modular.getExtensionConfig('test')
     const points = modular.getExtensionPoint('test')
     // 不可变对象测试
     expect(() => { modules.push('test') }).toThrowError(TypeError)
-    expect(() => { exts.push('test') }).toThrowError(TypeError)
-    expect(() => { points.push('test') }).toThrowError(TypeError)
+    // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError)
+    // expect(() => { extConfig.push('test') }).toThrowError(TypeError)
+    // expect(() => { points['test'] = 'test' }).toThrowError(TypeError)
     expect(() => { app.name = 'test' }).toThrowError(TypeError)
     expect(() => { app.test = 'test' }).toThrowError(TypeError)
     expect(() => { delete app.name }).toThrowError(TypeError)
@@ -27,6 +29,7 @@ describe('Modular 单元测试', () => {
     expect(app).toEqual(application)
     expect(modules).toEqual([app])
     expect(exts).toEqual({})
+    expect(extConfig).toEqual([])
     expect(points).toEqual({})
     expect(modular.strict).toBe(false)
     // 上述执行过程无错误日志产生
@@ -41,7 +44,12 @@ describe('Modular 单元测试', () => {
         data.m3
       ])
     })
-    expect(modular.getModules()).toEqual([data.m3, data.m2, data.m1, application])
+    expect(modular.getModules()).toEqual([
+      data.m3,
+      data.m2,
+      data.m1,
+      application
+    ])
   })
 
   it('扩展配置覆盖测试', () => {
@@ -65,7 +73,24 @@ describe('Modular 单元测试', () => {
       ep4: data.ep4,
       ep5: data.ep5
     })
-    expect(modular.getExtensions()).toEqual({ ep1: { m9: 'm10->m9-ext1', m10: 'm10-ext1' } })
+    expect(modular.getExtensions()).toEqual({
+      ep1: {
+        m9: { name: 'm10->m9-ext1', valid: true },
+        m10: { name: 'm10-ext1', valid: true }
+      },
+      ep2: {
+        m10: { name: 'm10=ext2', valid: true }
+      }
+    })
+    expect(modular.getExtension('ep1')).toEqual({
+      m9: { name: 'm10->m9-ext1', valid: true },
+      m10: { name: 'm10-ext1', valid: true }
+    })
+    expect(modular.getExtensionConfig('ep1')).toEqual([
+      { name: 'm9-ext1', valid: false },
+      { name: 'm10-ext1', valid: true },
+      { name: 'm10->m9-ext1', valid: true }
+    ])
   })
 
   it('异常测试', () => {
@@ -104,8 +129,18 @@ describe('Modular 单元测试', () => {
       ])
     })
     expect(modular.getLogs()).toEqual([
-      { level: 'error', code: 'E05', message: '重复的 extensionPoint 定义 ep1', data: [{ module: 'm8', config: {} }, data.m9] },
-      { level: 'error', code: 'E06', message: 'extensionPoint 定义不存在 ep0', data: [{ m10: 'm10-ext0' }, data.m10] }
+      {
+        level: 'error',
+        code: 'E05',
+        message: '重复的 extensionPoint 定义 ep1',
+        data: [{ module: 'm8', config: {} }, data.m9]
+      },
+      {
+        level: 'error',
+        code: 'E06',
+        message: 'extensionPoint 定义不存在 ep0',
+        data: [{ m10: { name: 'm10-ext0' } }, data.m10]
+      }
     ])
     expect(modular.getModules()).toEqual([
       data.m8,

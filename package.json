@@ -16,6 +16,7 @@
     "build": "babel src --out-dir dist",
     "lint": "eslint src/**",
     "test": "jest",
+    "postversion": "node script/sync-version.js",
     "prebuild": "rimraf dist/* && node script/sync-version.js",
     "prepublishOnly": "npm run build"
   },

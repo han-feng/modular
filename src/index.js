@@ -126,47 +126,49 @@ export default class Modular {
       if (module.extensionPoints) {
         module.extensionPoints = Object.freeze(module.extensionPoints)
         const ps = module.extensionPoints
-        for (let key in ps) {
-          if (points[key]) {
+        for (let name in ps) {
+          if (points[name]) {
             this._log({
               level: 'error',
               code: 'E05',
-              message: '重复的 extensionPoint 定义 ' + key,
+              message: '重复的 extensionPoint 定义 ' + name,
               data: [
-                points[key],
+                points[name],
                 module]
             })
           } else {
-            points[key] = { module: module.name, config: ps[key] }
+            points[name] = { module: module.name, config: ps[name] }
           }
         }
       }
       if (module.extensions) {
         module.extensions = Object.freeze(module.extensions)
         const ext = cloneDeep(module.extensions)
-        for (let key in ext) {
-          if (points[key]) {
-            extens[key] = extens[key] || {} // 初始化key对应的配置对象
-            extenConfigs[key] = extenConfigs[key] || [] // 初始化key对应的配置数组
-            const oldConfig = extens[key]
-            const newConfig = ext[key]
-            for (let name in newConfig) {
+        for (let name in ext) {
+          if (points[name]) {
+            extens[name] = extens[name] || {} // 初始化key对应的配置对象
+            extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
+            const oldConfig = extens[name]
+            const newConfig = ext[name]
+            for (let key in newConfig) {
               // 遍历当前扩展配置子项
-              if (oldConfig[name]) {
+              if (oldConfig[key]) {
                 // 被覆盖项目
-                oldConfig[name].valid = false
+                oldConfig[key].valid = false
+                oldConfig[key]._meta.covers.push(module.name)
               }
-              newConfig[name].valid = true
-              extenConfigs[key].push(newConfig[name])
+              newConfig[key].valid = true
+              newConfig[key]._meta = { module: module.name, key, covers: [] }
+              extenConfigs[name].push(newConfig[key])
             }
-            Object.assign(extens[key], ext[key]) // 混合配置对象
+            Object.assign(oldConfig, newConfig) // 混合配置对象
           } else {
             this._log({
               level: 'error',
               code: 'E06',
-              message: 'extensionPoint 定义不存在 ' + key,
+              message: 'extensionPoint 定义不存在 ' + name,
               data: [
-                ext[key],
+                ext[name],
                 module
               ]
             })
@@ -193,17 +195,21 @@ export default class Modular {
   getModules () {
     return this._modules
   }
-  // 获取指定名称的有效扩展配置
+  // 获取指定名称的有效扩展配置（对象形式）
   getExtension (name) {
     return this._extensions[name] || {}
   }
-  // 获取指定名称的全部扩展配置
+  // 获取全部有效的扩展配置（对象形式）
+  getExtensions () {
+    return this._extensions
+  }
+  // 获取指定名称的全部扩展配置（数组形式）
   getExtensionConfig (name) {
     return this._extensionConfigs[name] || []
   }
-  // 获取全部有效的扩展配置
-  getExtensions () {
-    return this._extensions
+  // 获取全部扩展配置（数组形式）
+  getExtensionConfigs () {
+    return this._extensionConfigs
   }
   // 获取指定名称的扩展点定义
   getExtensionPoint (name) {

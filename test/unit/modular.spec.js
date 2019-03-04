@@ -15,9 +15,9 @@ describe('Modular 单元测试', () => {
     const points = modular.getExtensionPoint('test')
     // 不可变对象测试
     expect(() => { modules.push('test') }).toThrowError(TypeError)
-    // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError)
-    // expect(() => { extConfig.push('test') }).toThrowError(TypeError)
-    // expect(() => { points['test'] = 'test' }).toThrowError(TypeError)
+    // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
+    // expect(() => { extConfig.push('test') }).toThrowError(TypeError) // 暂时未实现不可变
+    // expect(() => { points['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
     expect(() => { app.name = 'test' }).toThrowError(TypeError)
     expect(() => { app.test = 'test' }).toThrowError(TypeError)
     expect(() => { delete app.name }).toThrowError(TypeError)
@@ -75,21 +75,31 @@ describe('Modular 单元测试', () => {
     })
     expect(modular.getExtensions()).toEqual({
       ep1: {
-        m9: { name: 'm10->m9-ext1', valid: true },
-        m10: { name: 'm10-ext1', valid: true }
+        m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
+        m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
       },
       ep2: {
-        m10: { name: 'm10=ext2', valid: true }
+        m10: { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
       }
     })
     expect(modular.getExtension('ep1')).toEqual({
-      m9: { name: 'm10->m9-ext1', valid: true },
-      m10: { name: 'm10-ext1', valid: true }
+      m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
+      m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+    })
+    expect(modular.getExtensionConfigs()).toEqual({
+      ep1: [
+        { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
+        { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
+        { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
+      ],
+      ep2: [
+        { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+      ]
     })
     expect(modular.getExtensionConfig('ep1')).toEqual([
-      { name: 'm9-ext1', valid: false },
-      { name: 'm10-ext1', valid: true },
-      { name: 'm10->m9-ext1', valid: true }
+      { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
+      { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
+      { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
     ])
   })
 

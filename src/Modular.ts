@@ -1,39 +1,80 @@
 import { cloneDeep } from 'lodash'
 
-class ModulesLoader {
-  constructor () {
-    this._modules = []
-    this._nameMap = {}
-  }
-  add (module) {
+export interface Activator {
+  start(modular: Modular, module: Module): void
+}
+
+export class Module {
+  constructor(
+    public name: string,
+    public dependencies: string[] = [],
+    public extensionPoints: { [index: string]: any } = {},
+    public extensions: { [index: string]: any } = {},
+    public activator?: Activator
+  ) {}
+}
+
+export class Config {
+  constructor(
+    public modules: Module[],
+    public application: Module = new Module('Application'),
+    public strict: boolean = false
+  ) {}
+}
+
+export class LogInfo {
+  constructor(
+    public code: string,
+    public level: string = 'error',
+    public message: string = '',
+    public data?: any
+  ) {}
+}
+
+export class ModulesLoader {
+  private modules: Module[] = []
+  private nameMap: { [index: string]: Module } = {}
+
+  add(module: Module): void {
     if (!this.contains(module)) {
-      this._nameMap[module.name] = module
-      this._modules.push(module)
+      this.nameMap[module.name] = module
+      this.modules.push(module)
     }
   }
-  getModules () {
-    return this._modules
+
+  getModules(): Module[] {
+    return this.modules
   }
-  contains (module) {
-    return !!this._nameMap[module.name]
+
+  contains(module: Module): boolean {
+    return !!this.nameMap[module.name]
   }
 }
+
 // 模块化应用实现类
-export default class Modular {
+export class Modular {
+  public strict: boolean
+  private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
+  private application: Module
+  private modules: Module[]
+  private extensionPoints: { [index: string]: any }
+  private extensions: { [index: string]: any }
+  private extensionConfigs: { [index: string]: [] }
+
   // 构造函数
-  constructor (config) {
-    config = config || {}
-    let modules = config.modules || []
-    let app = config.application || {}
-    app.name = app.name || 'Application'
+  constructor(config?: Config) {
+    config = config || new Config([])
+    const app = config.application || {}
     this.strict = !!config.strict // 严格模式，暂未使用，保留
-    this._logs = [] // 异常信息
+
+    let modules = config.modules || []
+    app.name = app.name || 'Application'
 
     // 建立 name 查询索引
-    const nameMapping = {}
+    const nameMapping: { [index: string]: Module } = {}
     modules.forEach(module => {
       if (module.name === undefined) {
-        this._log({
+        this.log({
           level: 'error',
           code: 'E01',
           message: '模块名称未定义',
@@ -43,14 +84,11 @@ export default class Modular {
       }
       const name = module.name
       if (nameMapping[name]) {
-        this._log({
+        this.log({
           level: 'error',
           code: 'E02',
           message: '模块名称重复',
-          data: [
-            nameMapping[name],
-            module
-          ]
+          data: [nameMapping[name], module]
         })
         return
       }
@@ -63,7 +101,7 @@ export default class Modular {
     // TODO 处理优先加载模块
     // modulesLoader.add(nameMapping['modular-core'])
     const self = this
-    function fillDepens (item, cache = {}) {
+    function fillDepens(item: Module, cache: { [index: string]: Module } = {}) {
       if (item.name === undefined) {
         return false
       }
@@ -71,10 +109,10 @@ export default class Modular {
         return true
       }
       if (item.dependencies && item.dependencies.length) {
-        item.dependencies = Object.freeze(item.dependencies)
+        item.dependencies = Object.freeze(item.dependencies) as string[]
         const ds = item.dependencies
-        const len = ds.length
-        for (let i = 0; i < len; i++) {
+        const dslen = ds.length
+        for (let i = 0; i < dslen; i++) {
           const d = ds[i]
           if (nameMapping[d]) {
             if (cache[d]) {
@@ -87,7 +125,7 @@ export default class Modular {
               // 依赖项加载成功
               continue
             } else {
-              self._log({
+              self.log({
                 level: 'error',
                 code: 'E03',
                 message: '“' + item.name + '”依赖的模块“' + d + '”解析失败'
@@ -95,7 +133,7 @@ export default class Modular {
               return false
             }
           } else {
-            self._log({
+            self.log({
               level: 'error',
               code: 'E04',
               message: '“' + item.name + '”依赖的模块“' + d + '”不存在'
@@ -117,24 +155,22 @@ export default class Modular {
     modules = modulesLoader.getModules()
 
     // 组装扩展配置
-    const points = {}
-    const extens = {}
-    const extenConfigs = {}
+    const points: { [index: string]: any } = {}
+    const extens: { [index: string]: any } = {}
+    const extenConfigs: { [index: string]: any } = {}
     const len = modules.length
     for (let i = 0; i < len; i++) {
-      let module = modules[i]
+      const module = modules[i]
       if (module.extensionPoints) {
         module.extensionPoints = Object.freeze(module.extensionPoints)
         const ps = module.extensionPoints
-        for (let name in ps) {
+        for (const name in ps) {
           if (points[name]) {
-            this._log({
+            this.log({
               level: 'error',
               code: 'E05',
               message: '重复的 extensionPoint 定义 ' + name,
-              data: [
-                points[name],
-                module]
+              data: [points[name], module]
             })
           } else {
             points[name] = { module: module.name, config: ps[name] }
@@ -144,13 +180,14 @@ export default class Modular {
       if (module.extensions) {
         module.extensions = Object.freeze(module.extensions)
         const ext = cloneDeep(module.extensions)
-        for (let name in ext) {
+        for (const name in ext) {
           if (points[name]) {
             extens[name] = extens[name] || {} // 初始化key对应的配置对象
             extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
             const oldConfig = extens[name]
             const newConfig = ext[name]
-            for (let key in newConfig) {
+            // tslint:disable-next-line:forin
+            for (const key in newConfig) {
               // 遍历当前扩展配置子项
               if (oldConfig[key]) {
                 // 被覆盖项目
@@ -163,76 +200,75 @@ export default class Modular {
             }
             Object.assign(oldConfig, newConfig) // 混合配置对象
           } else {
-            this._log({
+            this.log({
               level: 'error',
               code: 'E06',
               message: 'extensionPoint 定义不存在 ' + name,
-              data: [
-                ext[name],
-                module
-              ]
+              data: [ext[name], module]
             })
           }
         }
       }
       modules[i] = Object.freeze(module)
     }
-    this._application = Object.freeze(app) // 应用配置
-    this._modules = Object.freeze(modules)
-    this._extensionPoints = Object.freeze(points)
-    this._extensions = Object.freeze(extens)
-    this._extensionConfigs = Object.freeze(extenConfigs)
+    this.application = Object.freeze(app) // 应用配置
+    this.modules = Object.freeze(modules) as Module[]
+    this.extensionPoints = Object.freeze(points)
+    this.extensions = Object.freeze(extens)
+    this.extensionConfigs = Object.freeze(extenConfigs)
   }
   // 获取应用配置
-  getApplication () {
-    return this._application
+  getApplication() {
+    return this.application
   }
   // 获取指定名称的模块配置
-  getModule (name) {
-    return this._modules.find(item => item.name === name)
+  getModule(name: string) {
+    return this.modules.find((item: Module): boolean => item.name === name)
   }
   // 获取全部模块配置
-  getModules () {
-    return this._modules
+  getModules() {
+    return this.modules
   }
   // 获取指定名称的有效扩展配置（对象形式）
-  getExtension (name) {
-    return this._extensions[name] || {}
+  getExtension(name: string) {
+    return this.extensions[name] || {}
   }
   // 获取全部有效的扩展配置（对象形式）
-  getExtensions () {
-    return this._extensions
+  getExtensions() {
+    return this.extensions
   }
   // 获取指定名称的全部扩展配置（数组形式）
-  getExtensionConfig (name) {
-    return this._extensionConfigs[name] || []
+  getExtensionConfig(name: string) {
+    return this.extensionConfigs[name] || []
   }
   // 获取全部扩展配置（数组形式）
-  getExtensionConfigs () {
-    return this._extensionConfigs
+  getExtensionConfigs() {
+    return this.extensionConfigs
   }
   // 获取指定名称的扩展点定义
-  getExtensionPoint (name) {
-    return this._extensionPoints[name] || {}
+  getExtensionPoint(name: string) {
+    return this.extensionPoints[name] || {}
   }
   // 获取全部有效的扩展点定义
-  getExtensionPoints () {
-    return this._extensionPoints
+  getExtensionPoints() {
+    return this.extensionPoints
   }
   // 启动模块化应用
-  start () {
-    this._modules.forEach(module => {
+  start() {
+    this.modules.forEach(module => {
       if (module.activator && module.activator.start) {
         module.activator.start(this, module)
       }
     })
   }
-  getLogs () {
-    return Object.freeze(this._logs)
+  getLogs() {
+    return Object.freeze(this.logs) as LogInfo[]
   }
   // 记录日志
-  _log (info) {
-    this._logs.push(info)
+  private log(info: LogInfo) {
+    this.logs.push(info)
     // console.log(info)
   }
 }
+
+export default Modular

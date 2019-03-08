@@ -24,8 +24,10 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.3.4",
     "@types/jest": "^24.0.9",
     "@types/lodash": "^4.14.122",
+    "babel-jest": "^24.3.1",
     "chalk": "^2.4.2",
     "jest": "^24.3.1",
     "rimraf": "^2.6.3",
@@ -40,7 +42,8 @@
       "json"
     ],
     "transform": {
-      "^.+\\.(t|j)sx?$": "ts-jest"
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.jsx?$": "babel-jest"
     },
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"

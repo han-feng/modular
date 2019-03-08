@@ -1,19 +1,13 @@
-import { Modular, ModuleConfig, Activator } from '../../src/Modular'
-
-class LoggerActivator implements Activator {
-  public static logs: string[] = []
-  start(modular: Modular, module: ModuleConfig) {
-    LoggerActivator.logs.push(module.name)
-  }
-  clean() {
-    LoggerActivator.logs.splice(0, LoggerActivator.logs.length)
-  }
-  getLogs() {
-    return LoggerActivator.logs
+const logs = []
+const activator = {
+  logs,
+  start (modular, module) {
+    logs.push(module.name)
+  },
+  clean () {
+    logs.splice(0, logs.length)
   }
 }
-
-const activator = new LoggerActivator()
 
 export default {
   activator,
@@ -36,7 +30,6 @@ export default {
     ]
   },
   m4: {
-    name: ''
   },
   m5: {
     name: 'm5',
@@ -55,7 +48,7 @@ export default {
     dependencies: [
       'm4',
       'm5'
-      ]
+    ]
   },
   m8: {
     name: 'm8',

@@ -1,8 +1,8 @@
-import Modular, { Module, Config } from '../../src/Modular'
+import { ModuleConfig, ApplicationConfig, Config, Modular } from '../../src/Modular'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
-const application = new Module( 'Application' )
+const application = new ApplicationConfig()
 
 describe('Modular 单元测试', () => {
   test('默认构造函数测试', () => {
@@ -14,7 +14,7 @@ describe('Modular 单元测试', () => {
     const extConfig = modular.getExtensionConfig('test')
     const points = modular.getExtensionPoint('test')
     // 不可变对象测试
-    expect(() => { modules.push(new Module('test')) }).toThrowError(TypeError)
+    expect(() => { modules.push({ name: 'test'}) }).toThrowError(TypeError)
     // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
     // expect(() => { extConfig.push('test') }).toThrowError(TypeError) // 暂时未实现不可变
     // expect(() => { points['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
@@ -36,15 +36,13 @@ describe('Modular 单元测试', () => {
   })
 
   test('循环依赖测试', () => {
-    const modular = new Modular(
-      new Config(
-        cloneDeep([
+    const modular: Modular = new Modular({
+        modules: cloneDeep([
           data.m1,
           data.m2,
           data.m3
-        ]) as Module[]
-      )
-    )
+        ])
+    })
     expect(modular.getModules()).toEqual([
       data.m3,
       data.m2,
@@ -54,15 +52,13 @@ describe('Modular 单元测试', () => {
   })
 
   test('扩展配置覆盖测试', () => {
-    const modular = new Modular(
-      new Config(
-        cloneDeep([
-          data.m8,
-          data.m9,
-          data.m10
-        ]) as Module[]
-      )
-    )
+    const modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
     expect(modular.getModules()).toEqual([
       data.m8,
       data.m9,
@@ -107,22 +103,20 @@ describe('Modular 单元测试', () => {
   })
 
   test('异常测试', () => {
-    let modular = new Modular(
-      new Config(
-        cloneDeep([
-          data.m4,
-          data.m1,
-          data.m2,
-          data.m1,
-          data.m3,
-          data.m5,
-          data.m6,
-          data.m7
-        ]) as Module[]
-      )
-    )
+    let modular = new Modular({
+      modules: cloneDeep([
+        data.m4,
+        data.m1,
+        data.m2,
+        data.m1,
+        data.m3,
+        data.m5,
+        data.m6,
+        data.m7
+      ])
+    })
     expect(modular.getLogs()).toEqual([
-      { level: 'error', code: 'E01', message: '模块名称未定义', data: {} },
+      { level: 'error', code: 'E01', message: '模块名称未定义', data: {name: ''} },
       { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] },
       { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
       { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
@@ -136,15 +130,14 @@ describe('Modular 单元测试', () => {
       application
     ])
 
-    modular = new Modular(
-      new Config(
-        cloneDeep([
-          data.m8,
-          data.m9,
-          data.m10
-        ]) as Module[]
-      )
-    )
+    modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
+
     expect(modular.getLogs()).toEqual([
       {
         level: 'error',
@@ -175,15 +168,13 @@ describe('Modular 单元测试', () => {
   })
 
   test('start() 测试', () => {
-    const modular = new Modular(
-      new Config(
-        cloneDeep([
-          data.m8,
-          data.m9,
-          data.m10
-        ]) as Module[]
-      )
-    )
+    const modular = new Modular({
+      modules: cloneDeep([
+        data.m8,
+        data.m9,
+        data.m10
+      ])
+    })
     data.activator.clean() // 清理测试记录
     modular.start()
     expect(data.activator.getLogs()).toEqual(['m8', 'm9', 'm10'])

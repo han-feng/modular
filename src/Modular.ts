@@ -1,52 +1,55 @@
 import { cloneDeep } from 'lodash'
 
 export interface Activator {
-  start(modular: Modular, module: Module): void
+  start(modular: Modular, module: ModuleConfig): void
 }
 
-export class Module {
-  constructor(
-    public name: string,
-    public dependencies: string[] = [],
-    public extensionPoints: { [index: string]: any } = {},
-    public extensions: { [index: string]: any } = {},
-    public activator?: Activator
-  ) {}
+export class ModuleConfig {
+  public name: string = ''
+  public dependencies?: string[] = []
+  public extensionPoints?: { [index: string]: any } = {}
+  public extensions?: { [index: string]: any } = {}
+  public activator?: Activator
+}
+
+export class ApplicationConfig extends ModuleConfig {
+  public version: string = ''
+  constructor() {
+    super()
+    this.name = 'Application'
+  }
 }
 
 export class Config {
-  constructor(
-    public modules: Module[],
-    public application: Module = new Module('Application'),
-    public strict: boolean = false
-  ) {}
+  public modules: ModuleConfig[] = []
+  public application?: ApplicationConfig = new ApplicationConfig()
+  public env?: {[index: string]: any} = {}
+  public strict?: boolean = false
 }
 
 export class LogInfo {
-  constructor(
-    public code: string,
-    public level: string = 'error',
-    public message: string = '',
-    public data?: any
-  ) {}
+  public code: string
+  public level: string = 'error'
+  public message: string = ''
+  public data?: any
+  constructor(code: string) {
+    this.code = code
+  }
 }
 
 export class ModulesLoader {
-  private modules: Module[] = []
-  private nameMap: { [index: string]: Module } = {}
-
-  add(module: Module): void {
+  private modules: ModuleConfig[] = []
+  private nameMap: { [index: string]: ModuleConfig } = {}
+  add(module: ModuleConfig): void {
     if (!this.contains(module)) {
       this.nameMap[module.name] = module
       this.modules.push(module)
     }
   }
-
-  getModules(): Module[] {
+  getModules(): ModuleConfig[] {
     return this.modules
   }
-
-  contains(module: Module): boolean {
+  contains(module: ModuleConfig): boolean {
     return !!this.nameMap[module.name]
   }
 }
@@ -55,25 +58,23 @@ export class ModulesLoader {
 export class Modular {
   public strict: boolean
   private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
-  private application: Module
-  private modules: Module[]
+  private application: ApplicationConfig
+  private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: any }
   private extensions: { [index: string]: any }
   private extensionConfigs: { [index: string]: [] }
 
   // 构造函数
   constructor(config?: Config) {
-    config = config || new Config([])
-    const app = config.application || {}
+    config = config || new Config()
+    const app = config.application || new ApplicationConfig()
     this.strict = !!config.strict // 严格模式，暂未使用，保留
-
     let modules = config.modules || []
-    app.name = app.name || 'Application'
 
     // 建立 name 查询索引
-    const nameMapping: { [index: string]: Module } = {}
+    const nameMapping: { [index: string]: ModuleConfig } = {}
     modules.forEach(module => {
-      if (module.name === undefined) {
+      if (module.name === undefined || module.name === '') {
         this.log({
           level: 'error',
           code: 'E01',
@@ -101,8 +102,8 @@ export class Modular {
     // TODO 处理优先加载模块
     // modulesLoader.add(nameMapping['modular-core'])
     const self = this
-    function fillDepens(item: Module, cache: { [index: string]: Module } = {}) {
-      if (item.name === undefined) {
+    function fillDepens(item: ModuleConfig, cache: { [index: string]: ModuleConfig } = {}) {
+      if (item.name === undefined || item.name === '') {
         return false
       }
       if (modulesLoader.contains(item)) {
@@ -212,7 +213,7 @@ export class Modular {
       modules[i] = Object.freeze(module)
     }
     this.application = Object.freeze(app) // 应用配置
-    this.modules = Object.freeze(modules) as Module[]
+    this.modules = Object.freeze(modules) as ModuleConfig[]
     this.extensionPoints = Object.freeze(points)
     this.extensions = Object.freeze(extens)
     this.extensionConfigs = Object.freeze(extenConfigs)
@@ -223,7 +224,7 @@ export class Modular {
   }
   // 获取指定名称的模块配置
   getModule(name: string) {
-    return this.modules.find((item: Module): boolean => item.name === name)
+    return this.modules.find((item: ModuleConfig): boolean => item.name === name)
   }
   // 获取全部模块配置
   getModules() {

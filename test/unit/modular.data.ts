@@ -1,8 +1,8 @@
-import { Modular, Module, Activator } from '../../src/Modular'
+import { Modular, ModuleConfig, Activator } from '../../src/Modular'
 
 class LoggerActivator implements Activator {
   public static logs: string[] = []
-  start(modular: Modular, module: Module) {
+  start(modular: Modular, module: ModuleConfig) {
     LoggerActivator.logs.push(module.name)
   }
   clean() {
@@ -29,7 +29,9 @@ export default {
     name: 'm3',
     dependencies: ['m1']
   },
-  m4: {},
+  m4: {
+    name: ''
+  },
   m5: {
     name: 'm5',
     dependencies: ['m0']

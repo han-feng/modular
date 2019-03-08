@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.8-ts-0",
+  "version": "0.3.8-ts-1",
   "description": "JavaScript application modular support",
   "main": "./dist/Modular.js",
   "types": "./dist/Modular.d.ts",
@@ -27,7 +27,7 @@
     "@types/jest": "^24.0.9",
     "@types/lodash": "^4.14.122",
     "chalk": "^2.4.2",
-    "jest": "^24.1.0",
+    "jest": "^24.3.1",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.0",
     "tslint": "^5.11.0",

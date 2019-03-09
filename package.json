@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "0.3.8-ts-1",
+  "version": "0.4",
   "description": "JavaScript application modular support",
   "main": "./dist/Modular.js",
   "types": "./dist/Modular.d.ts",
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "lint": "tslint -p tsconfig.json",
+    "lint": "tslint -p tsconfig.json --fix",
     "test": "jest",
     "prebuild": "rimraf dist/* && node script/sync-version.js",
     "prepublishOnly": "npm run build"

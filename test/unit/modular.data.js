@@ -93,7 +93,7 @@ export default {
         m9: { name: 'm10->m9-ext1' }
       },
       ep2: {
-        m10: { name: 'm10=ext2' }
+        m10: 'm10=ext2'
       }
     },
     activator

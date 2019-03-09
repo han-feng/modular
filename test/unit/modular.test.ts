@@ -75,31 +75,29 @@ describe('Modular 单元测试', () => {
     })
     expect(modular.getExtensions()).toEqual({
       ep1: {
-        m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
-        m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        m9: { name: 'm10->m9-ext1' },
+        m10: { name: 'm10-ext1' }
       },
       ep2: {
-        m10: { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        m10: 'm10=ext2'
       }
     })
     expect(modular.getExtension('ep1')).toEqual({
-      m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
-      m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+      m9: { name: 'm10->m9-ext1' },
+      m10: { name: 'm10-ext1' }
     })
     expect(modular.getExtensionConfigs()).toEqual({
       ep1: [
-        { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
-        { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
-        { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
+        { _module: 'm9', m9: { name: 'm9-ext1'}},
+        { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
       ],
       ep2: [
-        { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        { _module: 'm10', m10: 'm10=ext2'}
       ]
     })
     expect(modular.getExtensionConfig('ep1')).toEqual([
-      { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
-      { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
-      { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
+      { _module: 'm9', m9: { name: 'm9-ext1' }},
+      { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
     ])
   })
 

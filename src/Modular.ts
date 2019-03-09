@@ -28,6 +28,7 @@ export class Config {
 }
 
 export class LogInfo {
+  // TODO 修改为 getMessage() 方式
   public code: string
   public level: string = 'error'
   public message: string = ''
@@ -62,7 +63,7 @@ export class Modular {
   private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: any }
   private extensions: { [index: string]: any }
-  private extensionConfigs: { [index: string]: [] }
+  private extensionConfigs: { [index: string]: Array<{ module: string, config: any}> }
 
   // 构造函数
   constructor(config?: Config) {
@@ -185,21 +186,30 @@ export class Modular {
           if (points[name]) {
             extens[name] = extens[name] || {} // 初始化key对应的配置对象
             extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
-            const oldConfig = extens[name]
-            const newConfig = ext[name]
+            const allConfig = extens[name]
+            const currConfig = ext[name]
             // tslint:disable-next-line:forin
-            for (const key in newConfig) {
-              // 遍历当前扩展配置子项
-              if (oldConfig[key]) {
-                // 被覆盖项目
-                oldConfig[key].valid = false
-                oldConfig[key]._meta.covers.push(module.name)
-              }
-              newConfig[key].valid = true
-              newConfig[key]._meta = { module: module.name, key, covers: [] }
-              extenConfigs[name].push(newConfig[key])
-            }
-            Object.assign(oldConfig, newConfig) // 混合配置对象
+            // for (const key in newConfig) {
+              // // 遍历当前扩展配置子项
+              // if (oldConfig[key]) {
+              //   // 被覆盖项目
+              //   oldConfig[key].valid = false
+              //   oldConfig[key]._meta.covers.push(module.name)
+              // }
+              // newConfig[key].valid = true
+              // newConfig[key]._meta = { module: module.name, key, covers: [] }
+              // let config = {
+              //   module: module.name,
+              //   config: newConfig[key]
+              // }
+            //   extenConfigs[name].push({
+            //     module: module.name,
+            //     config: newConfig[key]
+            //   })
+            // }
+            Object.assign(allConfig, currConfig) // 混合配置对象
+            currConfig._module = module.name
+            extenConfigs[name].push(Object.freeze(currConfig))
           } else {
             this.log({
               level: 'error',

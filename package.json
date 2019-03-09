@@ -34,27 +34,5 @@
     "ts-jest": "^24.0.0",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "testMatch": [
-      "**/test/unit/**/*.(test|spec).(js|ts)"
-    ],
-    "collectCoverageFrom": [
-      "<rootDir>/src/**/*.{ts,js,json}"
-    ],
-    "browser": true,
-    "collectCoverage": true
   }
 }

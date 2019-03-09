@@ -43,7 +43,6 @@ export class LogInfo {
   ) {}
   getMessage() {
     const t = LogInfo.CODES[this.code]
-    JSON.stringify({})
     if (t) {
       return t(this.data)
     } else {

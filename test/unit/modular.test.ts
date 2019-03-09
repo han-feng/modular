@@ -1,11 +1,11 @@
-import Modular from '@/index'
+import { ApplicationConfig, Modular, LogInfo } from '@/Modular'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
-const application = { name: 'Application' }
+const application = new ApplicationConfig()
 
 describe('Modular 单元测试', () => {
-  it('默认构造函数测试', () => {
+  test('默认构造函数测试', () => {
     const modular = new Modular()
     const app = modular.getApplication()
     const app2 = modular.getModule('Application')
@@ -14,16 +14,16 @@ describe('Modular 单元测试', () => {
     const extConfig = modular.getExtensionConfig('test')
     const points = modular.getExtensionPoint('test')
     // 不可变对象测试
-    expect(() => { modules.push('test') }).toThrowError(TypeError)
+    expect(() => { modules.push({ name: 'test'}) }).toThrowError(TypeError)
     // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
-    // expect(() => { extConfig.push('test') }).toThrowError(TypeError) // 暂时未实现不可变
+    // expect(() => { extConfig.push({ _module: 'test' }) }).toThrowError(TypeError) // 暂时未实现不可变
     // expect(() => { points['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
     expect(() => { app.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app.test = 'test' }).toThrowError(TypeError)
+    // expect(() => { app.test = 'test' }).toThrowError(TypeError)
     expect(() => { delete app.name }).toThrowError(TypeError)
-    expect(() => { app2.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app2.test = 'test' }).toThrowError(TypeError)
-    expect(() => { delete app2.name }).toThrowError(TypeError)
+    // expect(() => { app2.name = 'test' }).toThrowError(TypeError)
+    // expect(() => { app2.test = 'test' }).toThrowError(TypeError)
+    // expect(() => { delete app2.name }).toThrowError(TypeError)
     // 默认值测试
     expect(app).toBe(app2)
     expect(app).toEqual(application)
@@ -36,13 +36,13 @@ describe('Modular 单元测试', () => {
     expect(modular.getLogs()).toEqual([])
   })
 
-  it('循环依赖测试', () => {
+  test('循环依赖测试', () => {
     const modular = new Modular({
-      modules: cloneDeep([
-        data.m1,
-        data.m2,
-        data.m3
-      ])
+        modules: cloneDeep([
+          data.m1,
+          data.m2,
+          data.m3
+        ])
     })
     expect(modular.getModules()).toEqual([
       data.m3,
@@ -52,7 +52,7 @@ describe('Modular 单元测试', () => {
     ])
   })
 
-  it('扩展配置覆盖测试', () => {
+  test('扩展配置覆盖测试', () => {
     const modular = new Modular({
       modules: cloneDeep([
         data.m8,
@@ -75,35 +75,33 @@ describe('Modular 单元测试', () => {
     })
     expect(modular.getExtensions()).toEqual({
       ep1: {
-        m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
-        m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        m9: { name: 'm10->m9-ext1' },
+        m10: { name: 'm10-ext1' }
       },
       ep2: {
-        m10: { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        m10: 'm10=ext2'
       }
     })
     expect(modular.getExtension('ep1')).toEqual({
-      m9: { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } },
-      m10: { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+      m9: { name: 'm10->m9-ext1' },
+      m10: { name: 'm10-ext1' }
     })
     expect(modular.getExtensionConfigs()).toEqual({
       ep1: [
-        { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
-        { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
-        { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
+        { _module: 'm9', m9: { name: 'm9-ext1'}},
+        { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
       ],
       ep2: [
-        { name: 'm10=ext2', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } }
+        { _module: 'm10', m10: 'm10=ext2'}
       ]
     })
     expect(modular.getExtensionConfig('ep1')).toEqual([
-      { name: 'm9-ext1', valid: false, _meta: { module: 'm9', key: 'm9', covers: ['m10'] } },
-      { name: 'm10-ext1', valid: true, _meta: { module: 'm10', key: 'm10', covers: [] } },
-      { name: 'm10->m9-ext1', valid: true, _meta: { module: 'm10', key: 'm9', covers: [] } }
+      { _module: 'm9', m9: { name: 'm9-ext1' }},
+      { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
     ])
   })
 
-  it('异常测试', () => {
+  test('异常测试', () => {
     let modular = new Modular({
       modules: cloneDeep([
         data.m4,
@@ -116,13 +114,13 @@ describe('Modular 单元测试', () => {
         data.m7
       ])
     })
-    expect(modular.getLogs()).toEqual([
-      { level: 'error', code: 'E01', message: '模块名称未定义', data: {} },
-      { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] },
-      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
-      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
-      { level: 'error', code: 'E03', message: '“m6”依赖的模块“m5”解析失败' },
-      { level: 'error', code: 'E04', message: '“m7”依赖的模块“m4”不存在' }
+    expect(modular.getLogs().map(item => item.toString())).toEqual([
+      '[E01] 模块名称未定义 {"name":""}',
+      '[E02] 模块名称重复 {"name":"m1","dependencies":["m2"]}, {"name":"m1","dependencies":["m2"]}',
+      '[E04] “m5”依赖的模块“m0”不存在',
+      '[E04] “m5”依赖的模块“m0”不存在',
+      '[E03] “m6”依赖的模块“m5”解析失败',
+      '[E04] “m7”依赖的模块“m4”不存在'
     ])
     expect(modular.getModules()).toEqual([
       data.m3,
@@ -138,19 +136,9 @@ describe('Modular 单元测试', () => {
         data.m10
       ])
     })
-    expect(modular.getLogs()).toEqual([
-      {
-        level: 'error',
-        code: 'E05',
-        message: '重复的 extensionPoint 定义 ep1',
-        data: [{ module: 'm8', config: {} }, data.m9]
-      },
-      {
-        level: 'error',
-        code: 'E06',
-        message: 'extensionPoint 定义不存在 ep0',
-        data: [{ m10: { name: 'm10-ext0' } }, data.m10]
-      }
+    expect(modular.getLogs().map(item => item.toString())).toEqual([
+      '[E05] 模块“m9”声明了重复的 extensionPoint “ep1”',
+      '[E06] 模块“m10”引用了不存在的 extensionPoint “ep0”'
     ])
     expect(modular.getModules()).toEqual([
       data.m8,
@@ -167,7 +155,7 @@ describe('Modular 单元测试', () => {
     })
   })
 
-  it('start() 测试', () => {
+  test('start() 测试', () => {
     const modular = new Modular({
       modules: cloneDeep([
         data.m8,
@@ -177,6 +165,12 @@ describe('Modular 单元测试', () => {
     })
     data.activator.clean() // 清理测试记录
     modular.start()
-    expect(data.activator.logs).toEqual(['m8', 'm9', 'm10'])
+    expect(data.activator.getLogs()).toEqual(['m8', 'm9', 'm10'])
+  })
+
+  test('LogInfo 测试', () => {
+    const log = new LogInfo('Error')
+    expect(log).toEqual({ level: 'error', code: 'Error' })
+    expect(log.getMessage()).toEqual('未知异常')
   })
 })

@@ -1,8 +1,9 @@
 {
   "name": "modular-core",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "JavaScript application modular support",
-  "main": "./dist/index.js",
+  "main": "./dist/Modular.js",
+  "types": "./dist/Modular.d.ts",
   "files": [
     "dist"
   ],
@@ -13,8 +14,8 @@
     "url": "git+https://github.com/han-feng/modular.git"
   },
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "lint": "eslint src/**",
+    "build": "tsc",
+    "lint": "tslint -p tsconfig.json --fix",
     "test": "jest",
     "prebuild": "rimraf dist/* && node script/sync-version.js",
     "prepublishOnly": "npm run build"
@@ -23,47 +24,35 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
-    "@vue/eslint-config-standard": "^4.0.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.1.0",
+    "@types/jest": "^24.0.9",
+    "@types/lodash": "^4.14.122",
+    "babel-jest": "^24.3.1",
     "chalk": "^2.4.2",
-    "eslint": "^5.15.0",
-    "eslint-plugin-vue": "^5.2.2",
-    "jest": "^24.1.0",
-    "rimraf": "^2.6.3"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/strongly-recommended",
-      "@vue/standard"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
+    "jest": "^24.3.1",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.6"
   },
   "jest": {
     "moduleFileExtensions": [
+      "ts",
       "js",
       "json"
     ],
     "transform": {
+      "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"
     },
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     },
     "testMatch": [
-      "**/test/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)"
+      "**/test/unit/**/*.(test|spec).(js|ts)"
     ],
     "collectCoverageFrom": [
-      "<rootDir>/src/**/*.{js,json}"
+      "<rootDir>/src/**/*.{ts,js,json}"
     ],
     "browser": true,
     "collectCoverage": true

@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, template, TemplateExecutor } from 'lodash'
 
 export interface Activator {
   start(modular: Modular, module: ModuleConfig): void
@@ -28,13 +28,30 @@ export class Config {
 }
 
 export class LogInfo {
-  // TODO 修改为 getMessage() 方式
-  public code: string
-  public level: string = 'error'
-  public message: string = ''
-  public data?: any
-  constructor(code: string) {
-    this.code = code
+  static readonly CODES: {[index: string]: TemplateExecutor} = {
+    E01: template('模块名称未定义 ${JSON.stringify(m)}'),
+    E02: template('模块名称重复 ${JSON.stringify(m1)}, ${JSON.stringify(m2)}'),
+    E03: template('“${m1.name}”依赖的模块“${m2}”解析失败'),
+    E04: template('“${m1.name}”依赖的模块“${m2}”不存在'),
+    E05: template('模块“${m.name}”声明了重复的 extensionPoint “${ep}”'),
+    E06: template('模块“${m.name}”引用了不存在的 extensionPoint “${ep}”'),
+  }
+  constructor(
+    public code: string,
+    public level: string = 'error',
+    public data?: any
+  ) {}
+  getMessage() {
+    const t = LogInfo.CODES[this.code]
+    JSON.stringify({})
+    if (t) {
+      return t(this.data)
+    } else {
+      return '未知异常'
+    }
+  }
+  toString() {
+    return `[${this.code}] ${this.getMessage()}`
   }
 }
 
@@ -63,7 +80,7 @@ export class Modular {
   private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: any }
   private extensions: { [index: string]: any }
-  private extensionConfigs: { [index: string]: Array<{ module: string, config: any}> }
+  private extensionConfigs: { [index: string]: Array<{ _module: string, [index: string]: any}> }
 
   // 构造函数
   constructor(config?: Config) {
@@ -76,22 +93,12 @@ export class Modular {
     const nameMapping: { [index: string]: ModuleConfig } = {}
     modules.forEach(module => {
       if (module.name === undefined || module.name === '') {
-        this.log({
-          level: 'error',
-          code: 'E01',
-          message: '模块名称未定义',
-          data: module
-        })
+        this.log(new LogInfo('E01', 'error', { m: module }))
         return
       }
       const name = module.name
       if (nameMapping[name]) {
-        this.log({
-          level: 'error',
-          code: 'E02',
-          message: '模块名称重复',
-          data: [nameMapping[name], module]
-        })
+        this.log(new LogInfo('E02', 'error', { m1: nameMapping[name], m2: module }))
         return
       }
       nameMapping[name] = module
@@ -127,19 +134,11 @@ export class Modular {
               // 依赖项加载成功
               continue
             } else {
-              self.log({
-                level: 'error',
-                code: 'E03',
-                message: '“' + item.name + '”依赖的模块“' + d + '”解析失败'
-              })
+              self.log(new LogInfo('E03', 'error', { m1: item, m2: d }))
               return false
             }
           } else {
-            self.log({
-              level: 'error',
-              code: 'E04',
-              message: '“' + item.name + '”依赖的模块“' + d + '”不存在'
-            })
+            self.log(new LogInfo('E04', 'error', { m1: item, m2: d }))
             return false
           }
         }
@@ -168,12 +167,7 @@ export class Modular {
         const ps = module.extensionPoints
         for (const name in ps) {
           if (points[name]) {
-            this.log({
-              level: 'error',
-              code: 'E05',
-              message: '重复的 extensionPoint 定义 ' + name,
-              data: [points[name], module]
-            })
+            this.log(new LogInfo('E05', 'error', { m: module, ep: name } ))
           } else {
             points[name] = { module: module.name, config: ps[name] }
           }
@@ -188,35 +182,11 @@ export class Modular {
             extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
             const allConfig = extens[name]
             const currConfig = ext[name]
-            // tslint:disable-next-line:forin
-            // for (const key in newConfig) {
-              // // 遍历当前扩展配置子项
-              // if (oldConfig[key]) {
-              //   // 被覆盖项目
-              //   oldConfig[key].valid = false
-              //   oldConfig[key]._meta.covers.push(module.name)
-              // }
-              // newConfig[key].valid = true
-              // newConfig[key]._meta = { module: module.name, key, covers: [] }
-              // let config = {
-              //   module: module.name,
-              //   config: newConfig[key]
-              // }
-            //   extenConfigs[name].push({
-            //     module: module.name,
-            //     config: newConfig[key]
-            //   })
-            // }
             Object.assign(allConfig, currConfig) // 混合配置对象
             currConfig._module = module.name
             extenConfigs[name].push(Object.freeze(currConfig))
           } else {
-            this.log({
-              level: 'error',
-              code: 'E06',
-              message: 'extensionPoint 定义不存在 ' + name,
-              data: [ext[name], module]
-            })
+            this.log(new LogInfo('E06', 'error', { m: module, ep: name }))
           }
         }
       }
@@ -278,7 +248,8 @@ export class Modular {
   // 记录日志
   private log(info: LogInfo) {
     this.logs.push(info)
-    // console.log(info)
+    // tslint:disable-next-line:no-console
+    // console.log(info.toString())
   }
 }
 

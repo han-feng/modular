@@ -6,6 +6,9 @@ const activator = {
   },
   clean () {
     logs.splice(0, logs.length)
+  },
+  getLogs() {
+    return logs
   }
 }
 

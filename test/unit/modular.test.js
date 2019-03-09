@@ -1,4 +1,4 @@
-import { ApplicationConfig, Modular } from '@/Modular'
+import { ApplicationConfig, Modular, LogInfo } from '@/Modular'
 import data from './modular.data.js'
 import { cloneDeep } from 'lodash'
 
@@ -145,13 +145,13 @@ describe('Modular 单元测试', () => {
         data.m7
       ])
     })
-    expect(modular.getLogs()).toEqual([
-      { level: 'error', code: 'E01', message: '模块名称未定义', data: {} },
-      { level: 'error', code: 'E02', message: '模块名称重复', data: [data.m1, data.m1] },
-      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
-      { level: 'error', code: 'E04', message: '“m5”依赖的模块“m0”不存在' },
-      { level: 'error', code: 'E03', message: '“m6”依赖的模块“m5”解析失败' },
-      { level: 'error', code: 'E04', message: '“m7”依赖的模块“m4”不存在' }
+    expect(modular.getLogs().map(item => item.toString())).toEqual([
+      '[E01] 模块名称未定义 {}',
+      '[E02] 模块名称重复 {"name":"m1","dependencies":["m2"]}, {"name":"m1","dependencies":["m2"]}',
+      '[E04] “m5”依赖的模块“m0”不存在',
+      '[E04] “m5”依赖的模块“m0”不存在',
+      '[E03] “m6”依赖的模块“m5”解析失败',
+      '[E04] “m7”依赖的模块“m4”不存在'
     ])
     expect(modular.getModules()).toEqual([
       data.m3,
@@ -167,19 +167,9 @@ describe('Modular 单元测试', () => {
         data.m10
       ])
     })
-    expect(modular.getLogs()).toEqual([
-      {
-        level: 'error',
-        code: 'E05',
-        message: '重复的 extensionPoint 定义 ep1',
-        data: [{ module: 'm8', config: {} }, data.m9]
-      },
-      {
-        level: 'error',
-        code: 'E06',
-        message: 'extensionPoint 定义不存在 ep0',
-        data: [{ m10: { name: 'm10-ext0' } }, data.m10]
-      }
+    expect(modular.getLogs().map(item => item.toString())).toEqual([
+      '[E05] 模块“m9”声明了重复的 extensionPoint “ep1”',
+      '[E06] 模块“m10”引用了不存在的 extensionPoint “ep0”'
     ])
     expect(modular.getModules()).toEqual([
       data.m8,
@@ -206,6 +196,12 @@ describe('Modular 单元测试', () => {
     })
     data.activator.clean() // 清理测试记录
     modular.start()
-    expect(data.activator.logs).toEqual(['m8', 'm9', 'm10'])
+    expect(data.activator.getLogs()).toEqual(['m8', 'm9', 'm10'])
+  })
+
+  test('LogInfo 测试', () => {
+    const log = new LogInfo('Error')
+    expect(log).toEqual({ level: 'error', code: 'Error' })
+    expect(log.getMessage()).toEqual('未知异常')
   })
 })

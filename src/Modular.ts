@@ -1,4 +1,4 @@
-import { cloneDeep, template, TemplateExecutor } from 'lodash'
+import { template, TemplateExecutor } from 'lodash'
 
 export interface Activator {
   start(modular: Modular, module: ModuleConfig): void
@@ -174,13 +174,13 @@ export class Modular {
       }
       if (module.extensions) {
         module.extensions = Object.freeze(module.extensions)
-        const ext = cloneDeep(module.extensions)
+        const ext = module.extensions
         for (const name in ext) {
           if (points[name]) {
             extens[name] = extens[name] || {} // 初始化key对应的配置对象
             extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
             const allConfig = extens[name]
-            const currConfig = ext[name]
+            const currConfig = Object.assign({}, ext[name])
             Object.assign(allConfig, currConfig) // 混合配置对象
             currConfig._module = module.name
             extenConfigs[name].push(Object.freeze(currConfig))

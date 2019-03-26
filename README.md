@@ -13,3 +13,4 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=han-feng_modular&metric=code_smells)](https://sonarcloud.io/dashboard?id=han-feng_modular)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=han-feng_modular&metric=coverage)](https://sonarcloud.io/dashboard?id=han-feng_modular)
 [![codecov](https://codecov.io/gh/han-feng/modular/branch/master/graph/badge.svg)](https://codecov.io/gh/han-feng/modular)
+[![Maintainability](https://api.codeclimate.com/v1/badges/81ee4ea8619795c3df9f/maintainability)](https://codeclimate.com/github/han-feng/modular/maintainability)

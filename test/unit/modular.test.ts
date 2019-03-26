@@ -5,8 +5,8 @@ import { cloneDeep } from 'lodash'
 const application = new ApplicationConfig()
 
 describe('Modular 单元测试', () => {
-  test('默认构造函数测试', () => {
-    const modular = new Modular()
+  test.each([ undefined, { modules: [] } ])('默认构造函数测试', (config) => {
+    const modular = new Modular(config)
     const app = modular.getApplication()
     const app2 = modular.getModule('Application')
     const modules = modular.getModules()

@@ -5,39 +5,8 @@ import { cloneDeep } from 'lodash'
 const application = new ApplicationConfig()
 
 describe('Modular 单元测试', () => {
-  test('默认构造函数测试', () => {
-    const modular = new Modular()
-    const app = modular.getApplication()
-    const app2 = modular.getModule('Application')
-    const modules = modular.getModules()
-    const exts = modular.getExtension('test')
-    const extConfig = modular.getExtensionConfig('test')
-    const points = modular.getExtensionPoint('test')
-    // 不可变对象测试
-    expect(() => { modules.push('test') }).toThrowError(TypeError)
-    // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
-    // expect(() => { extConfig.push('test') }).toThrowError(TypeError) // 暂时未实现不可变
-    // expect(() => { points['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
-    expect(() => { app.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app.test = 'test' }).toThrowError(TypeError)
-    expect(() => { delete app.name }).toThrowError(TypeError)
-    expect(() => { app2.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app2.test = 'test' }).toThrowError(TypeError)
-    expect(() => { delete app2.name }).toThrowError(TypeError)
-    // 默认值测试
-    expect(app).toBe(app2)
-    expect(app).toEqual(application)
-    expect(modules).toEqual([app])
-    expect(exts).toEqual({})
-    expect(extConfig).toEqual([])
-    expect(points).toEqual({})
-    expect(modular.strict).toBe(false)
-    // 上述执行过程无错误日志产生
-    expect(modular.getLogs()).toEqual([])
-  })
-
-  test('默认构造函数测试2', () => {
-    const modular = new Modular({})
+  test.each([ undefined, {}, { modules: [] } ])('默认构造函数测试', (config) => {
+    const modular = new Modular(config)
     const app = modular.getApplication()
     const app2 = modular.getModule('Application')
     const modules = modular.getModules()

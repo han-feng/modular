@@ -22,7 +22,7 @@ export class ApplicationConfig extends ModuleConfig {
 
 export class Config {
   public modules: ModuleConfig[] = []
-  public application: ApplicationConfig = new ApplicationConfig()
+  public application?: ApplicationConfig
   public env?: {[index: string]: any} = {}
   public strict?: boolean = false
 }

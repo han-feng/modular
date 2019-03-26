@@ -140,19 +140,6 @@ describe('Modular 单元测试', () => {
       '[E05] 模块“m9”声明了重复的 extensionPoint “ep1”',
       '[E06] 模块“m10”引用了不存在的 extensionPoint “ep0”'
     ])
-    expect(modular.getModules()).toEqual([
-      data.m8,
-      data.m9,
-      data.m10,
-      application
-    ])
-    expect(modular.getExtensionPoints()).toEqual({
-      ep1: data.ep1,
-      ep2: data.ep2,
-      ep3: data.ep3,
-      ep4: data.ep4,
-      ep5: data.ep5
-    })
   })
 
   test('start() 测试', () => {

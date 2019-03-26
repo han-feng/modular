@@ -19,4 +19,4 @@ script:
 after_success:
   - npx codecov --token=$CODECOV_TOKEN
   - sonar-scanner
-  - cat ./coverage/lcov.info | npx codacy-coverage --token $CODACY_PROJECT_TOKEN --username han-feng --accountToken $CODACY_API_TOKEN
+  - cat ./coverage/lcov.info | npx codacy-coverage --projectName modular --token $CODACY_PROJECT_TOKEN --username han-feng --accountToken $CODACY_API_TOKEN

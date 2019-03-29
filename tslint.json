@@ -12,7 +12,6 @@
     "quotemark": [true, "single"],
     "indent": [true, "spaces", 2],
     "semicolon": false,
-    // "max-classes-per-file": false,
     "member-access": false,
     "trailing-comma": false,
     "arrow-parens": false,

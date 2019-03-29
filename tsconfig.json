@@ -12,24 +12,10 @@
     "declaration": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "types": [
-      "jest"
-    ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "lib": [
-      "es6",
-      "dom"
-    ]
+    "lib": ["es6", "dom"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "test"
-  ]
+  "include": ["src"]
 }

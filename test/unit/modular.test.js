@@ -1,11 +1,11 @@
-import { ApplicationConfig, Modular, LogInfo } from '@/Modular'
+import { default as Modular, ApplicationConfig, LogInfo } from '@/index'
 import data from './modular.data.js'
 import { cloneDeep } from 'lodash'
 
 const application = new ApplicationConfig()
 
 describe('Modular 单元测试', () => {
-  test.each([ undefined, {}, { modules: [] } ])('默认构造函数测试', (config) => {
+  test.each([undefined, {}, { modules: [] }])('默认构造函数测试', config => {
     const modular = new Modular(config)
     const app = modular.getApplication()
     const app2 = modular.getModule('Application')
@@ -14,16 +14,30 @@ describe('Modular 单元测试', () => {
     const extConfig = modular.getExtensionConfig('test')
     const points = modular.getExtensionPoint('test')
     // 不可变对象测试
-    expect(() => { modules.push('test') }).toThrowError(TypeError)
+    expect(() => {
+      modules.push('test')
+    }).toThrowError(TypeError)
     // expect(() => { exts['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
     // expect(() => { extConfig.push('test') }).toThrowError(TypeError) // 暂时未实现不可变
     // expect(() => { points['test'] = 'test' }).toThrowError(TypeError) // 暂时未实现不可变
-    expect(() => { app.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app.test = 'test' }).toThrowError(TypeError)
-    expect(() => { delete app.name }).toThrowError(TypeError)
-    expect(() => { app2.name = 'test' }).toThrowError(TypeError)
-    expect(() => { app2.test = 'test' }).toThrowError(TypeError)
-    expect(() => { delete app2.name }).toThrowError(TypeError)
+    expect(() => {
+      app.name = 'test'
+    }).toThrowError(TypeError)
+    expect(() => {
+      app.test = 'test'
+    }).toThrowError(TypeError)
+    expect(() => {
+      delete app.name
+    }).toThrowError(TypeError)
+    expect(() => {
+      app2.name = 'test'
+    }).toThrowError(TypeError)
+    expect(() => {
+      app2.test = 'test'
+    }).toThrowError(TypeError)
+    expect(() => {
+      delete app2.name
+    }).toThrowError(TypeError)
     // 默认值测试
     expect(app).toBe(app2)
     expect(app).toEqual(application)
@@ -38,11 +52,7 @@ describe('Modular 单元测试', () => {
 
   test('循环依赖测试', () => {
     const modular = new Modular({
-      modules: cloneDeep([
-        data.m1,
-        data.m2,
-        data.m3
-      ])
+      modules: cloneDeep([data.m1, data.m2, data.m3])
     })
     expect(modular.getModules()).toEqual([
       data.m3,
@@ -54,11 +64,7 @@ describe('Modular 单元测试', () => {
 
   test('扩展配置覆盖测试', () => {
     const modular = new Modular({
-      modules: cloneDeep([
-        data.m8,
-        data.m9,
-        data.m10
-      ])
+      modules: cloneDeep([data.m8, data.m9, data.m10])
     })
     expect(modular.getModules()).toEqual([
       data.m8,
@@ -88,16 +94,22 @@ describe('Modular 单元测试', () => {
     })
     expect(modular.getExtensionConfigs()).toEqual({
       ep1: [
-        { _module: 'm9', m9: { name: 'm9-ext1'}},
-        { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
+        { _module: 'm9', m9: { name: 'm9-ext1' } },
+        {
+          _module: 'm10',
+          m10: { name: 'm10-ext1' },
+          m9: { name: 'm10->m9-ext1' }
+        }
       ],
-      ep2: [
-        { _module: 'm10', m10: 'm10=ext2'}
-      ]
+      ep2: [{ _module: 'm10', m10: 'm10=ext2' }]
     })
     expect(modular.getExtensionConfig('ep1')).toEqual([
-      { _module: 'm9', m9: { name: 'm9-ext1' }},
-      { _module: 'm10', m10: { name: 'm10-ext1' }, m9: { name: 'm10->m9-ext1' }}
+      { _module: 'm9', m9: { name: 'm9-ext1' } },
+      {
+        _module: 'm10',
+        m10: { name: 'm10-ext1' },
+        m9: { name: 'm10->m9-ext1' }
+      }
     ])
   })
 
@@ -130,11 +142,7 @@ describe('Modular 单元测试', () => {
     ])
 
     modular = new Modular({
-      modules: cloneDeep([
-        data.m8,
-        data.m9,
-        data.m10
-      ])
+      modules: cloneDeep([data.m8, data.m9, data.m10])
     })
     expect(modular.getLogs().map(item => item.toString())).toEqual([
       '[E05] 模块“m9”声明了重复的 extensionPoint “ep1”',
@@ -144,11 +152,7 @@ describe('Modular 单元测试', () => {
 
   test('start() 测试', () => {
     const modular = new Modular({
-      modules: cloneDeep([
-        data.m8,
-        data.m9,
-        data.m10
-      ])
+      modules: cloneDeep([data.m8, data.m9, data.m10])
     })
     data.activator.clean() // 清理测试记录
     modular.start()

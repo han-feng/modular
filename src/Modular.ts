@@ -1,80 +1,13 @@
-import { template, TemplateExecutor } from 'lodash'
-
-export interface Activator {
-  start(modular: Modular, module: ModuleConfig): void
-}
-
-export class ModuleConfig {
-  public name: string = ''
-  public dependencies?: string[] = []
-  public extensionPoints?: { [index: string]: any } = {}
-  public extensions?: { [index: string]: any } = {}
-  public activator?: Activator
-}
-
-export class ApplicationConfig extends ModuleConfig {
-  public version: string = ''
-  constructor() {
-    super()
-    this.name = 'Application'
-  }
-}
-
-export class Config {
-  public modules: ModuleConfig[] = []
-  public application?: ApplicationConfig
-  public env?: {[index: string]: any} = {}
-  public strict?: boolean = false
-}
-
-export class LogInfo {
-  static readonly CODES: {[index: string]: TemplateExecutor} = {
-    E01: template('模块名称未定义 ${JSON.stringify(m)}'),
-    E02: template('模块名称重复 ${JSON.stringify(m1)}, ${JSON.stringify(m2)}'),
-    E03: template('“${m1.name}”依赖的模块“${m2}”解析失败'),
-    E04: template('“${m1.name}”依赖的模块“${m2}”不存在'),
-    E05: template('模块“${m.name}”声明了重复的 extensionPoint “${ep}”'),
-    E06: template('模块“${m.name}”引用了不存在的 extensionPoint “${ep}”'),
-  }
-  constructor(
-    public code: string,
-    public level: string = 'error',
-    public data?: any
-  ) {}
-  getMessage() {
-    const t = LogInfo.CODES[this.code]
-    if (t) {
-      return t(this.data)
-    } else {
-      return '未知异常'
-    }
-  }
-  toString() {
-    return `[${this.code}] ${this.getMessage()}`
-  }
-}
-
-export class ModulesLoader {
-  private modules: ModuleConfig[] = []
-  private nameMap: { [index: string]: ModuleConfig } = {}
-  add(module: ModuleConfig): void {
-    if (!this.contains(module)) {
-      this.nameMap[module.name] = module
-      this.modules.push(module)
-    }
-  }
-  getModules(): ModuleConfig[] {
-    return this.modules
-  }
-  contains(module: ModuleConfig): boolean {
-    return !!this.nameMap[module.name]
-  }
-}
+import ModuleConfig from './ModuleConfig'
+import ApplicationConfig from './ApplicationConfig'
+import Config from './Config'
+import LogInfo from './LogInfo'
+import ModulesLoader from './ModulesLoader'
 
 /**
  * 模块化应用实现类
  */
-export class Modular {
+export default class Modular {
   public strict: boolean
   private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
   private application: ApplicationConfig
@@ -323,5 +256,3 @@ export class Modular {
     return true
   }
 }
-
-export default Modular

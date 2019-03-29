@@ -1,9 +1,9 @@
 {
   "name": "modular-core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "JavaScript application modular support",
-  "main": "./dist/Modular.js",
-  "types": "./dist/Modular.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],

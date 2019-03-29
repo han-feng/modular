@@ -1,4 +1,4 @@
-import { Modular, ModuleConfig, Activator } from '../../src/Modular'
+import { default as Modular, ModuleConfig, Activator } from '@/index'
 
 class LoggerActivator implements Activator {
   public static logs: string[] = []
@@ -19,43 +19,30 @@ export default {
   activator,
   m1: {
     name: 'm1',
-    dependencies: [
-      'm2'
-    ]
+    dependencies: ['m2']
   },
   m2: {
     name: 'm2',
-    dependencies: [
-      'm3'
-    ]
+    dependencies: ['m3']
   },
   m3: {
     name: 'm3',
-    dependencies: [
-      'm1'
-    ]
+    dependencies: ['m1']
   },
   m4: {
     name: ''
   },
   m5: {
     name: 'm5',
-    dependencies: [
-      'm0'
-    ]
+    dependencies: ['m0']
   },
   m6: {
     name: 'm6',
-    dependencies: [
-      'm5'
-    ]
+    dependencies: ['m5']
   },
   m7: {
     name: 'm7',
-    dependencies: [
-      'm4',
-      'm5'
-      ]
+    dependencies: ['m4', 'm5']
   },
   m8: {
     name: 'm8',
@@ -67,9 +54,7 @@ export default {
   },
   m9: {
     name: 'm9',
-    dependencies: [
-      'm8'
-    ],
+    dependencies: ['m8'],
     extensionPoints: {
       ep1: {},
       ep3: {}
@@ -83,10 +68,7 @@ export default {
   },
   m10: {
     name: 'm10',
-    dependencies: [
-      'm8',
-      'm9'
-    ],
+    dependencies: ['m8', 'm9'],
     extensionPoints: {
       ep4: {},
       ep5: {}

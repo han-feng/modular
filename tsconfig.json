@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "esnext",
+    "module": "es6",
     "strict": true,
     "importHelpers": true,
     "removeComments": true,
@@ -21,7 +21,7 @@
       ]
     },
     "lib": [
-      "esnext",
+      "es6",
       "dom"
     ]
   },

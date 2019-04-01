@@ -16,13 +16,10 @@ before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
-  - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
 
 script:
   - npm run build
   - npm test
-  - fossa init
-  - fossa analyze
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
@@ -31,4 +28,3 @@ after_success:
   - npx codecov --token=$CODECOV_TOKEN
   - sonar-scanner
   - cat ./coverage/lcov.info | npx codacy-coverage --projectName modular --token $CODACY_PROJECT_TOKEN --username han-feng --accountToken $CODACY_API_TOKEN
-  - fossa test

@@ -3,6 +3,7 @@ import ApplicationConfig from './ApplicationConfig'
 import Config from './Config'
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
+import ExtensionPoint from './ExtensionPoint'
 
 /**
  * 模块化应用实现类
@@ -12,7 +13,7 @@ export default class Modular {
   private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
   private application: ApplicationConfig
   private modules: ModuleConfig[]
-  private extensionPoints: { [index: string]: any } = {}
+  private extensionPoints: { [index: string]: ExtensionPoint } = {}
   private extensions: { [index: string]: any } = {}
   private extensionConfigs: { [index: string]: Array<{ _module: string, [index: string]: any}> } = {}
 
@@ -166,7 +167,7 @@ export default class Modular {
     modules = modulesLoader.getModules()
 
     // 组装扩展配置
-    const points: { [index: string]: any } = {}
+    const points: { [index: string]: ExtensionPoint } = {}
     const extens: { [index: string]: any } = {}
     const extenConfigs: { [index: string]: any } = {}
     const len = modules.length
@@ -179,7 +180,7 @@ export default class Modular {
           if (points[name]) {
             this.log(new LogInfo('E05', 'error', { m: module, ep: name } ))
           } else {
-            points[name] = { module: module.name, config: ps[name] }
+            points[name] = { ...ps[name], module: module.name }
           }
         }
       }

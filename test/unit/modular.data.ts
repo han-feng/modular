@@ -1,4 +1,5 @@
 import { default as Modular, ModuleConfig, Activator } from '@/index'
+import { Type } from '@/ExtensionPoint'
 
 class LoggerActivator implements Activator {
   public static logs: string[] = []
@@ -47,8 +48,8 @@ export default {
   m8: {
     name: 'm8',
     extensionPoints: {
-      ep1: {},
-      ep2: {}
+      ep1: { type: Type.array },
+      ep2: { type: Type.array }
     },
     activator
   },
@@ -56,8 +57,8 @@ export default {
     name: 'm9',
     dependencies: ['m8'],
     extensionPoints: {
-      ep1: {},
-      ep3: {}
+      ep1: { type: Type.array },
+      ep3: { type: Type.array }
     },
     extensions: {
       ep1: {
@@ -70,8 +71,8 @@ export default {
     name: 'm10',
     dependencies: ['m8', 'm9'],
     extensionPoints: {
-      ep4: {},
-      ep5: {}
+      ep4: { type: Type.array },
+      ep5: { type: Type.array }
     },
     extensions: {
       ep0: {
@@ -89,22 +90,22 @@ export default {
   },
   ep1: {
     module: 'm8',
-    config: {}
+    type: Type.array
   },
   ep2: {
     module: 'm8',
-    config: {}
+    type: Type.array
   },
   ep3: {
     module: 'm9',
-    config: {}
+    type: Type.array
   },
   ep4: {
     module: 'm10',
-    config: {}
+    type: Type.array
   },
   ep5: {
     module: 'm10',
-    config: {}
+    type: Type.array
   }
 }

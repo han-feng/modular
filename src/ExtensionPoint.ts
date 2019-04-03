@@ -4,7 +4,11 @@
  * mixin: 混合形式，由多个扩展配置混合形成最后有效的配置；
  * single: 单一对象，只有最后的扩展配置有效
  */
-export enum Type { array, mixin, single }
+export enum Type {
+  array,
+  mixin,
+  single
+}
 
 /**
  * 扩展点声明对象

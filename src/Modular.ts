@@ -15,7 +15,9 @@ export default class Modular {
   private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: ExtensionPoint } = {}
   private extensions: { [index: string]: any } = {}
-  private extensionConfigs: { [index: string]: Array<{ _module: string, [index: string]: any}> } = {}
+  private extensionConfigs: {
+    [index: string]: Array<{ _module: string; [index: string]: any }>
+  } = {}
 
   /**
    * 构造函数
@@ -41,7 +43,9 @@ export default class Modular {
    * @param name 模块名称
    */
   getModule(name: string) {
-    return this.modules.find((module: ModuleConfig): boolean => module.name === name)
+    return this.modules.find(
+      (module: ModuleConfig): boolean => module.name === name
+    )
   }
 
   /**
@@ -137,12 +141,14 @@ export default class Modular {
       }
       const name = module.name
       if (nameMapping[name]) {
-        this.log(new LogInfo('E02', 'error', { m1: nameMapping[name], m2: module }))
+        this.log(
+          new LogInfo('E02', 'error', { m1: nameMapping[name], m2: module })
+        )
         return
       }
       nameMapping[name] = module
     })
-    return nameMapping;
+    return nameMapping
   }
 
   /**
@@ -153,7 +159,9 @@ export default class Modular {
     let modules = this.modules
 
     // 建立 name 查询索引
-    const nameMapping: { [index: string]: ModuleConfig } = this.createNameMapping(modules)
+    const nameMapping: {
+      [index: string]: ModuleConfig
+    } = this.createNameMapping(modules)
     // 解析依赖，模块排序
     const modulesLoader = new ModulesLoader()
     // TODO 处理优先加载模块
@@ -178,7 +186,7 @@ export default class Modular {
         const ps = module.extensionPoints
         for (const name in ps) {
           if (points[name]) {
-            this.log(new LogInfo('E05', 'error', { m: module, ep: name } ))
+            this.log(new LogInfo('E05', 'error', { m: module, ep: name }))
           } else {
             points[name] = { ...ps[name], module: module.name }
           }
@@ -217,9 +225,12 @@ export default class Modular {
    * @param nameMapping 模块名称索引
    * @param cache 当前处理中的模块缓存
    */
-  private loadDepens(module: ModuleConfig, modulesLoader: ModulesLoader,
-                     nameMapping: { [index: string]: ModuleConfig },
-                     cache: { [index: string]: ModuleConfig } = {}) {
+  private loadDepens(
+    module: ModuleConfig,
+    modulesLoader: ModulesLoader,
+    nameMapping: { [index: string]: ModuleConfig },
+    cache: { [index: string]: ModuleConfig } = {}
+  ) {
     if (module.name === undefined || module.name === '') {
       return false
     }
@@ -238,7 +249,9 @@ export default class Modular {
             return true
           }
           cache[d] = nameMapping[d]
-          if (this.loadDepens(nameMapping[d], modulesLoader, nameMapping, cache)) {
+          if (
+            this.loadDepens(nameMapping[d], modulesLoader, nameMapping, cache)
+          ) {
             delete cache[d]
             // 依赖项加载成功
             continue

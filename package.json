@@ -2,13 +2,13 @@
   "name": "modular-core",
   "version": "0.6.1",
   "description": "JavaScript application modular support",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "author": "Han Feng <han_feng@foxmail.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "author": "Han Feng <han_feng@foxmail.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/han-feng/modular.git"
@@ -24,15 +24,20 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.4.2",
+    "@babel/preset-env": "^7.4.3",
     "@types/jest": "^24.0.11",
     "@types/lodash": "^4.14.123",
-    "babel-jest": "^24.5.0",
+    "babel-jest": "^24.7.0",
     "chalk": "^2.4.2",
-    "jest": "^24.5.0",
+    "jest": "^24.7.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.1",
-    "tslint": "^5.14.0",
+    "tslint": "^5.15.0",
     "typescript": "^3.4.1"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }

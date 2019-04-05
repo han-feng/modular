@@ -22,7 +22,7 @@ export interface ExtensionPoint {
  * 默认的扩展点声明实现类
  */
 export class DefaultExtensionPoint implements ExtensionPoint {
-  type: Type
+  readonly type: Type
   module?: string
 
   private extensions: any[] = []

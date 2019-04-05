@@ -1,17 +1,37 @@
-import ModuleConfig from './ModuleConfig'
-import ApplicationConfig from './ApplicationConfig'
-import Config from './Config'
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
-import { DefaultExtensionPoint } from './ExtensionPoint'
+import { ExtensionPoint, DefaultExtensionPoint } from './ExtensionPoint'
+
+export interface Activator {
+  start(modular: Modular, module: ModuleConfig): void
+}
+
+export interface ModuleConfig {
+  name: string
+  dependencies?: string[]
+  extensionPoints?: { [index: string]: ExtensionPoint }
+  extensions?: { [index: string]: any }
+  activator?: Activator
+}
+
+export interface ApplicationConfig extends ModuleConfig {
+  version?: string
+}
+
+export interface ModularOptions {
+  modules: ModuleConfig[]
+  application?: ApplicationConfig
+  env?: { [index: string]: any }
+  strict?: boolean
+}
 
 /**
  * 模块化应用实现类
  */
 export default class Modular {
-  public strict: boolean
+  public readonly strict: boolean
   private inited: boolean = false
-  private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
+  private readonly logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
   private application: ApplicationConfig
   private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: DefaultExtensionPoint } = {}
@@ -20,11 +40,11 @@ export default class Modular {
    * 构造函数
    * @param config 初始配置
    */
-  constructor(config?: Config) {
-    config = config || new Config()
-    this.strict = !!config.strict // 严格模式，暂未使用，保留
-    this.modules = config.modules || []
-    this.application = config.application || new ApplicationConfig()
+  constructor(options?: ModularOptions) {
+    options = options || { modules: [] }
+    this.strict = !!options.strict // 严格模式，暂未使用，保留
+    this.modules = options.modules || []
+    this.application = options.application || { name: 'Application' }
     this.init()
   }
 

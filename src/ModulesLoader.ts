@@ -1,9 +1,8 @@
-
-import ModuleConfig from './ModuleConfig'
+import { ModuleConfig } from './Modular'
 
 export default class ModulesLoader {
-  private modules: ModuleConfig[] = []
-  private nameMap: { [index: string]: ModuleConfig } = {}
+  private readonly modules: ModuleConfig[] = []
+  private readonly nameMap: { [index: string]: ModuleConfig } = {}
   add(module: ModuleConfig): void {
     if (!this.contains(module)) {
       this.nameMap[module.name] = module

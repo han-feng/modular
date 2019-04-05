@@ -2,7 +2,7 @@ import { default as Modular, ApplicationConfig, LogInfo } from '@/index'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
-const application = new ApplicationConfig()
+const application: ApplicationConfig = { name: 'Application' }
 
 describe('Modular 单元测试', () => {
   test.each([undefined, { modules: [] }])('默认构造函数测试', config => {

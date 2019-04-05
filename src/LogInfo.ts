@@ -11,9 +11,9 @@ export default class LogInfo {
     E06: template('模块“${m.name}”引用了不存在的 extensionPoint “${ep}”')
   }
   constructor(
-    public code: string,
-    public level: string = 'error',
-    public data?: any
+    public readonly code: string,
+    public readonly level: string = 'error',
+    public readonly data?: any
   ) {}
   getMessage() {
     const t = LogInfo.CODES[this.code]

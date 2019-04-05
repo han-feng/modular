@@ -1,5 +1,5 @@
 import { default as Modular, ModuleConfig, Activator } from '@/index'
-import { Type } from '@/ExtensionPoint'
+import { Type, DefaultExtensionPoint } from '@/ExtensionPoint'
 
 class LoggerActivator implements Activator {
   public static logs: string[] = []
@@ -48,8 +48,8 @@ export default {
   m8: {
     name: 'm8',
     extensionPoints: {
-      ep1: { type: Type.array },
-      ep2: { type: Type.array }
+      ep1: { type: Type.Multiple },
+      ep2: { type: Type.Multiple }
     },
     activator
   },
@@ -57,8 +57,8 @@ export default {
     name: 'm9',
     dependencies: ['m8'],
     extensionPoints: {
-      ep1: { type: Type.array },
-      ep3: { type: Type.array }
+      ep1: { type: Type.Multiple },
+      ep3: { type: Type.Multiple }
     },
     extensions: {
       ep1: {
@@ -71,8 +71,8 @@ export default {
     name: 'm10',
     dependencies: ['m8', 'm9'],
     extensionPoints: {
-      ep4: { type: Type.array },
-      ep5: { type: Type.array }
+      ep4: { type: Type.Multiple },
+      ep5: { type: Type.Multiple }
     },
     extensions: {
       ep0: {
@@ -88,24 +88,24 @@ export default {
     },
     activator
   },
-  ep1: {
+  ep1: new DefaultExtensionPoint({
     module: 'm8',
-    type: Type.array
-  },
-  ep2: {
+    type: Type.Multiple
+  }),
+  ep2: new DefaultExtensionPoint({
     module: 'm8',
-    type: Type.array
-  },
-  ep3: {
+    type: Type.Multiple
+  }),
+  ep3: new DefaultExtensionPoint({
     module: 'm9',
-    type: Type.array
-  },
-  ep4: {
+    type: Type.Multiple
+  }),
+  ep4: new DefaultExtensionPoint({
     module: 'm10',
-    type: Type.array
-  },
-  ep5: {
+    type: Type.Multiple
+  }),
+  ep5: new DefaultExtensionPoint({
     module: 'm10',
-    type: Type.array
-  }
+    type: Type.Multiple
+  })
 }

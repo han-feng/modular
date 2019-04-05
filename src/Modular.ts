@@ -3,21 +3,18 @@ import ApplicationConfig from './ApplicationConfig'
 import Config from './Config'
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
-import ExtensionPoint from './ExtensionPoint'
+import { DefaultExtensionPoint } from './ExtensionPoint'
 
 /**
  * 模块化应用实现类
  */
 export default class Modular {
   public strict: boolean
+  private inited: boolean = false
   private logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
   private application: ApplicationConfig
   private modules: ModuleConfig[]
-  private extensionPoints: { [index: string]: ExtensionPoint } = {}
-  private extensions: { [index: string]: any } = {}
-  private extensionConfigs: {
-    [index: string]: Array<{ _module: string; [index: string]: any }>
-  } = {}
+  private extensionPoints: { [index: string]: DefaultExtensionPoint } = {}
 
   /**
    * 构造函数
@@ -56,33 +53,26 @@ export default class Modular {
   }
 
   /**
-   * 获取指定名称的有效扩展配置（对象形式）
+   * 获取指定名称的有效扩展配置
    * @param name 扩展点名称
    */
   getExtension(name: string) {
-    return this.extensions[name] || {}
+    const point = this.getExtensionPoint(name)
+    if (point !== null) {
+      return point.getExtension()
+    }
+    return null
   }
 
   /**
-   * 获取全部有效的扩展配置（对象形式）
+   * 获取全部有效的扩展配置
    */
-  getExtensions() {
-    return this.extensions
-  }
-
-  /**
-   * 获取指定名称的全部扩展配置（数组形式）
-   * @param name 扩展点名称
-   */
-  getExtensionConfig(name: string) {
-    return this.extensionConfigs[name] || []
-  }
-
-  /**
-   * 获取全部扩展配置（数组形式）
-   */
-  getExtensionConfigs() {
-    return this.extensionConfigs
+  getExtensions(name: string) {
+    const point = this.getExtensionPoint(name)
+    if (point !== null) {
+      return point.getExtensions()
+    }
+    return null
   }
 
   /**
@@ -90,7 +80,11 @@ export default class Modular {
    * @param name 扩展点名称
    */
   getExtensionPoint(name: string) {
-    return this.extensionPoints[name] || {}
+    const point = this.extensionPoints[name]
+    if (point === undefined) {
+      return null
+    }
+    return point
   }
 
   /**
@@ -155,6 +149,10 @@ export default class Modular {
    * 初始化
    */
   private init() {
+    if (this.inited) {
+      this.log(new LogInfo('E00', 'error'))
+      return
+    }
     const app = this.application
     let modules = this.modules
 
@@ -175,35 +173,28 @@ export default class Modular {
     modules = modulesLoader.getModules()
 
     // 组装扩展配置
-    const points: { [index: string]: ExtensionPoint } = {}
-    const extens: { [index: string]: any } = {}
-    const extenConfigs: { [index: string]: any } = {}
+    const points: { [index: string]: DefaultExtensionPoint } = {}
     const len = modules.length
     for (let i = 0; i < len; i++) {
       const module = modules[i]
       if (module.extensionPoints) {
-        module.extensionPoints = Object.freeze(module.extensionPoints)
         const ps = module.extensionPoints
         for (const name in ps) {
           if (points[name]) {
             this.log(new LogInfo('E05', 'error', { m: module, ep: name }))
           } else {
-            points[name] = { ...ps[name], module: module.name }
+            const point = new DefaultExtensionPoint(ps[name])
+            point.module = module.name
+            points[name] = point
           }
         }
       }
       if (module.extensions) {
-        module.extensions = Object.freeze(module.extensions)
         const ext = module.extensions
         for (const name in ext) {
           if (points[name]) {
-            extens[name] = extens[name] || {} // 初始化key对应的配置对象
-            extenConfigs[name] = extenConfigs[name] || [] // 初始化key对应的配置数组
-            const allConfig = extens[name]
-            const currConfig = Object.assign({}, ext[name])
-            Object.assign(allConfig, currConfig) // 混合配置对象
-            currConfig._module = module.name
-            extenConfigs[name].push(Object.freeze(currConfig))
+            // TODO 模块配置中的扩展配置暂时不支持多个配置形成的数组
+            points[name].addExtension(ext[name])
           } else {
             this.log(new LogInfo('E06', 'error', { m: module, ep: name }))
           }
@@ -214,8 +205,6 @@ export default class Modular {
     this.application = Object.freeze(app) // 应用配置
     this.modules = Object.freeze(modules) as ModuleConfig[]
     this.extensionPoints = Object.freeze(points)
-    this.extensions = Object.freeze(extens)
-    this.extensionConfigs = Object.freeze(extenConfigs)
   }
 
   /**

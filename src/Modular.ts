@@ -1,6 +1,6 @@
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
-import { ExtensionPoint, DefaultExtensionPoint } from './ExtensionPoint'
+import { ExtensionPoint, DefaultExtensionPoint, Type } from './ExtensionPoint'
 
 export interface Activator {
   start(modular: Modular, module: ModuleConfig): void
@@ -214,7 +214,11 @@ export default class Modular {
         for (const name in ext) {
           if (points[name]) {
             // TODO 模块配置中的扩展配置暂时不支持多个配置形成的数组
-            points[name].addExtension(ext[name])
+            if (points[name].type === Type.Multiple && Array.isArray(ext[name])) {
+              points[name].addExtension(...ext[name])
+            } else {
+              points[name].addExtension(ext[name])
+            }
           } else {
             this.log(new LogInfo('E06', 'error', { m: module, ep: name }))
           }

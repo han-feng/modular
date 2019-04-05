@@ -4,7 +4,6 @@
     "module": "es6",
     "strict": true,
     "importHelpers": true,
-    "removeComments": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "esModuleInterop": true,

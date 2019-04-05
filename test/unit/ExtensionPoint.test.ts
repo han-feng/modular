@@ -4,7 +4,14 @@ describe('ExtensionPoint 单元测试', () => {
   test('Multiple 测试', () => {
     const point = new DefaultExtensionPoint({ type: Type.Multiple })
 
+    point.addPreprocessors({
+      process() {
+        return null
+      }
+    })
+
     point.addExtension({ name: 'e1' }, { name: 'e2' }, { name: 'e3' })
+    point.getExtension() // 增加分支覆盖率
     expect(point.getExtension()).toEqual([
       { name: 'e1' },
       { name: 'e2' },
@@ -29,6 +36,12 @@ describe('ExtensionPoint 单元测试', () => {
       { name: 'e2' },
       { name: 'e3' }
     ])
+    point.addPreprocessors({
+      process() {
+        return { name: 'e0' }
+      }
+    })
+    expect(point.getExtension()).toEqual({ name: 'e0' })
   })
 
   test('Single 测试', () => {

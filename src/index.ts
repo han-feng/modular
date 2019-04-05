@@ -1,27 +1,21 @@
-import LogInfo from './LogInfo'
-import {
+// export {
+//   default as LogInfo
+// } from './LogInfo'
+
+export {
   Type as ExtensionPointType,
   ExtensionPoint,
   DefaultExtensionPoint
 } from './ExtensionPoint'
-import ModulesLoader from './ModulesLoader'
-import Modular, {
+
+// export {
+//   default as ModulesLoader
+// } from './ModulesLoader'
+
+export {
+  default as default, // class Modular
   ModuleConfig,
   ApplicationConfig,
   Activator,
   ModularOptions
 } from './Modular'
-
-export {
-  ModuleConfig,
-  ApplicationConfig,
-  Activator,
-  ModularOptions,
-  LogInfo,
-  ModulesLoader,
-  ExtensionPoint,
-  ExtensionPointType,
-  DefaultExtensionPoint
-}
-
-export default Modular

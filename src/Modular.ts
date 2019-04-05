@@ -1,6 +1,6 @@
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
-import { ExtensionPoint, DefaultExtensionPoint, Type } from './ExtensionPoint'
+import { ExtensionPoint, DefaultExtensionPoint, Type, Preprocessor } from './ExtensionPoint'
 
 export interface Activator {
   start(modular: Modular, module: ModuleConfig): void
@@ -11,6 +11,7 @@ export interface ModuleConfig {
   dependencies?: string[]
   extensionPoints?: { [index: string]: ExtensionPoint }
   extensions?: { [index: string]: any }
+  preprocessors?: { [index: string]: Preprocessor }
   activator?: Activator
 }
 
@@ -21,7 +22,6 @@ export interface ApplicationConfig extends ModuleConfig {
 export interface ModularOptions {
   modules: ModuleConfig[]
   application?: ApplicationConfig
-  env?: { [index: string]: any }
   strict?: boolean
 }
 
@@ -35,6 +35,7 @@ export default class Modular {
   private application: ApplicationConfig
   private modules: ModuleConfig[]
   private extensionPoints: { [index: string]: DefaultExtensionPoint } = {}
+  private attributes: { [index: string]: any } = {}
 
   /**
    * 构造函数
@@ -112,6 +113,30 @@ export default class Modular {
    */
   getExtensionPoints() {
     return this.extensionPoints
+  }
+
+  /**
+   * 获取属性名集合
+   */
+  getAttributeNames() {
+    return Object.keys(this.attributes)
+  }
+
+  /**
+   * 设置属性
+   * @param name 属性名
+   * @param value 属性值
+   */
+  setAttribute(name: string, value: any) {
+    this.attributes[name] = value
+  }
+
+  /**
+   * 获取属性值
+   * @param name 属性名
+   */
+  getAttribute(name: string) {
+    return this.attributes[name]
   }
 
   /**
@@ -209,11 +234,20 @@ export default class Modular {
           }
         }
       }
+      if (module.preprocessors) {
+        const processors = module.preprocessors
+        for (const name in processors) {
+          if (points[name]) {
+            points[name].addPreprocessors(processors[name])
+          } else {
+            this.log(new LogInfo('E06', 'error', { m: module, ep: name }))
+          }
+        }
+      }
       if (module.extensions) {
         const ext = module.extensions
         for (const name in ext) {
           if (points[name]) {
-            // TODO 模块配置中的扩展配置暂时不支持多个配置形成的数组
             if (points[name].type === Type.Multiple && Array.isArray(ext[name])) {
               points[name].addExtension(...ext[name])
             } else {

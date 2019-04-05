@@ -1,4 +1,5 @@
-import { default as Modular, ApplicationConfig, LogInfo } from '@/index'
+import { default as Modular, ApplicationConfig } from '@/index'
+import LogInfo from '@/LogInfo'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
@@ -127,8 +128,13 @@ describe('Modular 单元测试', () => {
     })
     expect(modular.getLogs().map(item => item.toString())).toEqual([
       '[E05] 模块“m9”声明了重复的 extensionPoint “ep1”',
+      '[E06] 模块“m10”引用了不存在的 extensionPoint “ep0”',
       '[E06] 模块“m10”引用了不存在的 extensionPoint “ep0”'
     ])
+    modular.setAttribute('testKey', 'hello')
+    modular.setAttribute('testKey2', '')
+    expect(modular.getAttribute('testKey')).toEqual('hello')
+    expect(modular.getAttributeNames()).toEqual(['testKey', 'testKey2'])
   })
 
   test('start() 测试', () => {

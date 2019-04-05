@@ -86,6 +86,23 @@ export default {
         m10: 'm10=ext2'
       }
     },
+    preprocessors: {
+      ep0: {
+        process() {
+          throw new Error('该语句不应该被执行到')
+        }
+      },
+      ep1: {
+        process() {
+          return null
+        }
+      },
+      ep2: {
+        process(extensions: any[]) {
+          return extensions
+        }
+      }
+    },
     activator
   },
   ep1: new DefaultExtensionPoint({

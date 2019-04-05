@@ -19,6 +19,18 @@ export interface ExtensionPoint {
 }
 
 /**
+ * 扩展配置预处理器接口
+ */
+export interface Preprocessor {
+  /**
+   * 扩展配置预处理
+   * @param extensions 待处理扩展配置数组
+   * @returns 处理后的扩展配置对象，对应于 DefaultExtensionPoint.getExtension() 方法的返回值
+   */
+  process(extensions: any[], extensionPoint: DefaultExtensionPoint): any
+}
+
+/**
  * 默认的扩展点声明实现类
  */
 export class DefaultExtensionPoint implements ExtensionPoint {
@@ -27,6 +39,8 @@ export class DefaultExtensionPoint implements ExtensionPoint {
 
   private extensions: any[] = []
   private extension: any = {}
+  private preprocessors: Preprocessor[] = []
+  private processed = false
 
   constructor(point: ExtensionPoint) {
     this.type = point.type
@@ -38,6 +52,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
    * @param extensions 扩展配置集合
    */
   addExtension(...extensions: any[]) {
+    this.processed = false
     this.extensions.push(...extensions)
     switch (this.type) {
       case Type.Single:
@@ -50,6 +65,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
       default:
     }
   }
+
   /**
    * 获取扩展
    * @returns 当扩展点类型为 Multiple 时，返回扩展配置对象数组；
@@ -57,22 +73,45 @@ export class DefaultExtensionPoint implements ExtensionPoint {
    *          当扩展点类型为 Mixin 时，返回所有扩展配置对象混合后的结果
    */
   getExtension() {
-    let extension = null
-    switch (this.type) {
-      case Type.Single:
-      case Type.Mixin:
-        extension = this.extension
-        break
-      case Type.Multiple:
-      default:
-        extension = this.extensions
+    if (this.processed) {
+      return this.extension
+    } else {
+      let extension = null
+      switch (this.type) {
+        case Type.Single:
+        case Type.Mixin:
+          extension = this.extension
+          break
+        case Type.Multiple:
+        default:
+          extension = this.extensions
+      }
+      this.preprocessors.forEach(processor => {
+        const result = processor.process(this.extensions, this)
+        if (result !== null) {
+          extension = result
+        }
+      })
+      this.extension = extension
+      this.processed = true
+      return extension
     }
-    return extension
   }
+
   /**
    * 获取全部扩展配置对象
    */
   getExtensions() {
     return this.extensions
   }
+
+  /**
+   * 添加预处理器
+   * @param proprocessors 预处理器集合
+   */
+  addPreprocessors(...proprocessors: Preprocessor[]) {
+    this.processed = false
+    this.preprocessors.push(...proprocessors)
+  }
+
 }

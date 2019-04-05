@@ -1,4 +1,4 @@
-import { Type } from '@/ExtensionPoint'
+import { Type, DefaultExtensionPoint } from '@/ExtensionPoint'
 
 const logs = []
 const activator = {
@@ -74,34 +74,48 @@ export default {
       ep0: {
         m10: { name: 'm10-ext0' }
       },
-      ep1: {
-        m10: { name: 'm10-ext1' },
-        m9: { name: 'm10->m9-ext1' }
-      },
+      ep1: [{ name: 'm10-ext1' }, { name: 'm10->m9-ext1' }],
       ep2: {
         m10: 'm10=ext2'
       }
     },
+    preprocessors: {
+      ep0: {
+        process() {
+          throw new Error('该语句不应该被执行到')
+        }
+      },
+      ep1: {
+        process() {
+          return null
+        }
+      },
+      ep2: {
+        process(extensions) {
+          return extensions
+        }
+      }
+    },
     activator
   },
-  ep1: {
+  ep1: new DefaultExtensionPoint({
     module: 'm8',
-    type: Type.array
-  },
-  ep2: {
+    type: Type.Multiple
+  }),
+  ep2: new DefaultExtensionPoint({
     module: 'm8',
-    type: Type.array
-  },
-  ep3: {
+    type: Type.Multiple
+  }),
+  ep3: new DefaultExtensionPoint({
     module: 'm9',
-    type: Type.array
-  },
-  ep4: {
+    type: Type.Multiple
+  }),
+  ep4: new DefaultExtensionPoint({
     module: 'm10',
-    type: Type.array
-  },
-  ep5: {
+    type: Type.Multiple
+  }),
+  ep5: new DefaultExtensionPoint({
     module: 'm10',
-    type: Type.array
-  }
+    type: Type.Multiple
+  })
 }

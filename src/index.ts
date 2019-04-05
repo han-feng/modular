@@ -1,4 +1,9 @@
 import LogInfo from './LogInfo'
+import {
+  Type as ExtensionPointType,
+  ExtensionPoint,
+  DefaultExtensionPoint
+} from './ExtensionPoint'
 import ModulesLoader from './ModulesLoader'
 import Modular, {
   ModuleConfig,
@@ -13,7 +18,10 @@ export {
   Activator,
   ModularOptions,
   LogInfo,
-  ModulesLoader
+  ModulesLoader,
+  ExtensionPoint,
+  ExtensionPointType,
+  DefaultExtensionPoint
 }
 
 export default Modular

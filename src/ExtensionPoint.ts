@@ -4,17 +4,17 @@
  * mixin: 混合形式，由多个扩展配置混合形成最后有效的配置；
  * single: 单一对象，只有最后的扩展配置有效
  */
-export enum Type {
-  Single = 'SINGLE',
-  Mixin = 'MIXIN',
-  Multiple = 'MULTIPLE'
-}
+export const Type = Object.freeze({
+  Single: 'SINGLE',
+  Mixin: 'MIXIN',
+  Multiple: 'MULTIPLE'
+})
 
 /**
  * 扩展点声明接口
  */
 export interface ExtensionPoint {
-  type: Type
+  type: string
   module?: string
 }
 
@@ -22,7 +22,7 @@ export interface ExtensionPoint {
  * 默认的扩展点声明实现类
  */
 export class DefaultExtensionPoint implements ExtensionPoint {
-  readonly type: Type
+  readonly type: string
   module?: string
 
   private extensions: any[] = []

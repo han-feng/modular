@@ -3,7 +3,11 @@ language: node_js
 node_js:
   - stable
   - "10"
-  - "8"
+
+os:
+  - linux
+  - windows
+  - osx
 
 addons:
   sonarcloud:

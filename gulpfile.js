@@ -1,4 +1,4 @@
-const gulp = require('gulp')
+const { dest, series } = require('gulp')
 const ts = require('gulp-typescript')
 const del = require('del')
 const pump = require('pump')
@@ -16,9 +16,9 @@ const build = function (callback) {
     project.src(),
     project(),
     license('MIT', { organization: 'han_feng@foxmail.com' }),
-    gulp.dest('dist')
+    dest('dist')
   ], callback)
 }
 exports.build = build
 
-exports.default = gulp.series(clean, build)
+exports.default = series(clean, build)

@@ -14,10 +14,10 @@
     "url": "git+https://github.com/han-feng/modular.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "gulp",
     "lint": "tslint -p tsconfig.json --fix",
     "test": "jest",
-    "prebuild": "rimraf dist/* && node script/sync-version.js",
+    "prebuild": "node script/sync-version.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -29,7 +29,12 @@
     "@types/lodash": "^4.14.123",
     "babel-jest": "^24.7.1",
     "chalk": "^2.4.2",
+    "del": "^4.1.0",
+    "gulp": "^4.0.0",
+    "gulp-license": "^1.1.0",
+    "gulp-typescript": "^5.0.1",
     "jest": "^24.7.1",
+    "pump": "^3.0.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
     "tslint": "^5.15.0",

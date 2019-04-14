@@ -1,8 +1,8 @@
 .DS_Store
-node_modules/
-dist/
-target/
-coverage/
+node_modules
+dist
+target
+coverage
 
 # local env files
 .env.local

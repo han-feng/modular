@@ -2,7 +2,7 @@ import { default as Modular, ModuleConfig, Activator } from '@/index'
 import { Type, DefaultExtensionPoint } from '@/ExtensionPoint'
 
 class LoggerActivator implements Activator {
-  public static logs: string[] = []
+  private static logs: string[] = []
   start(modular: Modular, module: ModuleConfig) {
     LoggerActivator.logs.push(module.name)
   }

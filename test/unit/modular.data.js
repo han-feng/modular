@@ -74,7 +74,10 @@ export default {
       ep0: {
         m10: { name: 'm10-ext0' }
       },
-      ep1: [{ name: 'm10-ext1' }, { name: 'm10->m9-ext1' }],
+      ep1: [
+        { name: 'm10-ext1' },
+        { name: 'm10->m9-ext1' }
+      ],
       ep2: {
         m10: 'm10=ext2'
       }

@@ -23,24 +23,11 @@ task('build', callback => {
   ], callback)
 })
 
-// task('jest', callback => {
-//   pump([
-//     src('test'),
-//     plugins.jest.default()
-//   ], callback)
-// })
-
 task('source', callback => {
   pump([
     // '**'不包含'.'开头的文件，需要补充'**/.*'
     src(['**{,/.*}', '!node_modules', '!.git']),
-    // plugins.excludeGitignore(), // 有问题
-    // plugins.gitignore(), // 有问题
     filter(file => !dotgitignore.ignore(file.path)),
-    // plugins.filter(file => {
-    //   console.log(file.path)
-    //   return true
-    // }),
     zip('source.zip'),
     dest('dist')
   ], callback)

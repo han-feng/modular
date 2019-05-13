@@ -86,8 +86,7 @@ export default class Modular {
   }
 
   /**
-   * 获取全部扩展的原始配置对象，这些配置对象未进行预处理加工
-   * @deprecated
+   * 获取扩展配置对象数组
    */
   getExtensions(name: string) {
     const point = this.getExtensionPoint(name)

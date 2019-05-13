@@ -67,15 +67,35 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   }
 
   /**
-   * 获取扩展
+   * 获取扩展配置对象
    * @returns 当扩展点类型为 Multiple 时，返回扩展配置对象数组；
    *          当扩展点类型为 Single 时，返回最后加入的扩展配置对象；
    *          当扩展点类型为 Mixin 时，返回所有扩展配置对象混合后的结果
    */
   getExtension() {
-    if (this.processed) {
-      return this.extension
-    } else {
+    this.preprocess()
+    return this.extension
+  }
+
+  /**
+   * 获取扩展配置对象数组
+   */
+  getExtensions() {
+    this.preprocess()
+    return this.extensions
+  }
+
+  /**
+   * 添加预处理器
+   * @param proprocessors 预处理器集合
+   */
+  addPreprocessors(...proprocessors: Preprocessor[]) {
+    this.processed = false
+    this.preprocessors.push(...proprocessors)
+  }
+
+  private preprocess() {
+    if (!this.processed) {
       let extension: any = null
       switch (this.type) {
         case Type.Single:
@@ -93,26 +113,11 @@ export class DefaultExtensionPoint implements ExtensionPoint {
         }
       })
       this.extension = extension
+      if (this.type === Type.Multiple) {
+        this.extensions = extension
+      }
       this.processed = true
-      return extension
     }
-  }
-
-  /**
-   * 获取全部扩展的原始配置对象，这些配置对象未进行预处理加工
-   * @deprecated
-   */
-  getExtensions() {
-    return this.extensions
-  }
-
-  /**
-   * 添加预处理器
-   * @param proprocessors 预处理器集合
-   */
-  addPreprocessors(...proprocessors: Preprocessor[]) {
-    this.processed = false
-    this.preprocessors.push(...proprocessors)
   }
 
 }

@@ -24,10 +24,10 @@ export interface ExtensionPoint {
 export interface Preprocessor {
   /**
    * 扩展配置预处理
-   * @param extensions 待处理扩展配置数组
+   * @param extension 待处理扩展配置对象
    * @returns 处理后的扩展配置对象，对应于 DefaultExtensionPoint.getExtension() 方法的返回值
    */
-  process(extensions: any[], extensionPoint: DefaultExtensionPoint): any
+  process(extension: any, extensionPoint: DefaultExtensionPoint): any
 }
 
 /**
@@ -76,7 +76,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
     if (this.processed) {
       return this.extension
     } else {
-      let extension = null
+      let extension: any = null
       switch (this.type) {
         case Type.Single:
         case Type.Mixin:
@@ -87,7 +87,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
           extension = this.extensions
       }
       this.preprocessors.forEach(processor => {
-        const result = processor.process(this.extensions, this)
+        const result = processor.process(extension, this)
         if (result !== null) {
           extension = result
         }
@@ -99,7 +99,8 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   }
 
   /**
-   * 获取全部扩展配置对象
+   * 获取全部扩展的原始配置对象，这些配置对象未进行预处理加工
+   * @deprecated
    */
   getExtensions() {
     return this.extensions

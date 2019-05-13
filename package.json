@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "JavaScript application modular support",
   "author": "Han Feng <han_feng@foxmail.com>",
   "license": "MIT",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.4.4",
     "@types/jest": "^24.0.12",
-    "@types/lodash": "^4.14.124",
+    "@types/lodash": "^4.14.126",
     "babel-jest": "^24.8.0",
     "chalk": "^2.4.2",
     "del": "^4.1.1",

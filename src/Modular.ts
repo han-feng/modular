@@ -208,8 +208,6 @@ export default class Modular {
     } = this.createNameMapping(modules)
     // 解析依赖，模块排序
     const modulesLoader = new ModulesLoader()
-    // TODO 处理优先加载模块
-    // modulesLoader.add(nameMapping['modular-core'])
     modules.forEach(module => {
       this.loadDepens(module, modulesLoader, nameMapping)
     })

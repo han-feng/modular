@@ -16,10 +16,10 @@ if (!version) {
 } else if (version !== process.env.npm_package_version) {
   // 需要更新 package.json
   const packagePath = 'package.json'
-  const packageJSON = require('../'+packagePath) // pacakge.json 在上一级目录中
+  const packageJSON = require('../' + packagePath) // pacakge.json 在上一级目录中
   packageJSON.version = version
 
-  fs.writeFileSync(packagePath, JSON.stringify(packageJSON,null,2))
+  fs.writeFileSync(packagePath, JSON.stringify(packageJSON, null, 2))
   console.log(chalk.green(`set package.version ${version}`))
 }
 

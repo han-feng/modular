@@ -74,25 +74,17 @@ describe('Modular 单元测试', () => {
     //   ep5: data.ep5
     // })
     expect(modular.getExtension('ep1')).toEqual([
-      { m9: { name: 'm9-ext1' } },
-      { name: 'm10-ext1' },
-      { name: 'm10->m9-ext1' }
+      { '@module': 'm9', 'm9': { name: 'm9-ext1' } },
+      { '@module': 'm10', 'name': 'm10-ext1' },
+      { '@module': 'm10', 'name': 'm10->m9-ext1' }
     ])
-    expect(modular.getExtension('ep2')).toEqual([
-      {
-        m10: 'm10=ext2'
-      }
-    ])
+    expect(modular.getExtension('ep2')).toEqual([{ '@module': 'm10', 'm10': 'm10=ext2' }])
     expect(modular.getExtensions('ep1')).toEqual([
-      { m9: { name: 'm9-ext1' } },
-      { name: 'm10-ext1' },
-      { name: 'm10->m9-ext1' }
+      { '@module': 'm9', 'm9': { name: 'm9-ext1' } },
+      { '@module': 'm10', 'name': 'm10-ext1' },
+      { '@module': 'm10', 'name': 'm10->m9-ext1' }
     ])
-    expect(modular.getExtensions('ep2')).toEqual([
-      {
-        m10: 'm10=ext2'
-      }
-    ])
+    expect(modular.getExtensions('ep2')).toEqual([{ '@module': 'm10', 'm10': 'm10=ext2' }])
   })
 
   test('异常测试', () => {

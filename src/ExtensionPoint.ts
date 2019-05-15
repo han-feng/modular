@@ -24,10 +24,10 @@ export interface ExtensionPoint {
 export interface Preprocessor {
   /**
    * 扩展配置预处理
-   * @param extension 待处理扩展配置对象
+   * @param extensions 待处理扩展配置对象数组
    * @returns 处理后的扩展配置对象，对应于 DefaultExtensionPoint.getExtension() 方法的返回值
    */
-  process(extension: any, extensionPoint: DefaultExtensionPoint): any
+  process(extensions: any[], extensionPoint: ExtensionPoint): any
 }
 
 /**
@@ -36,10 +36,18 @@ export interface Preprocessor {
 export class DefaultExtensionPoint implements ExtensionPoint {
   readonly type: string
   module?: string
-
-  private extensions: any[] = []
+  /**
+   * 原始配置对象
+   */
+  private readonly extensions: any[] = []
+  /**
+   * 处理过的配置对象
+   */
   private extension: any = {}
-  private preprocessors: Preprocessor[] = []
+  /**
+   * 预处理器
+   */
+  private readonly preprocessors: Preprocessor[] = []
   private processed = false
 
   constructor(point: ExtensionPoint) {
@@ -49,21 +57,13 @@ export class DefaultExtensionPoint implements ExtensionPoint {
 
   /**
    * 添加扩展
+   * @param module 扩展提供模块名称
    * @param extensions 扩展配置集合
    */
-  addExtension(...extensions: any[]) {
+  addExtension(module: string, ...extensions: any[]) {
     this.processed = false
+    extensions.forEach(item => item['@module'] = module)
     this.extensions.push(...extensions)
-    switch (this.type) {
-      case Type.Single:
-        this.extension = extensions[extensions.length - 1]
-        break
-      case Type.Mixin:
-        extensions.forEach(item => Object.assign(this.extension, item))
-        break
-      case Type.Multiple:
-      default:
-    }
   }
 
   /**
@@ -78,10 +78,9 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   }
 
   /**
-   * 获取扩展配置对象数组
+   * 获取原始配置对象数组，这些配置对象未经任何加工处理
    */
   getExtensions() {
-    this.preprocess()
     return this.extensions
   }
 
@@ -96,28 +95,45 @@ export class DefaultExtensionPoint implements ExtensionPoint {
 
   private preprocess() {
     if (!this.processed) {
-      let extension: any = null
+      let extension: any = {}
+      let extensions = this.extensions
       switch (this.type) {
         case Type.Single:
+          extension = extensions[extensions.length - 1]
+          extensions = this.processExtensions([extension])
+          if (extensions && extensions.length && extensions.length > 0) {
+            extension = extensions[0]
+          }
+          break
         case Type.Mixin:
-          extension = this.extension
+          extensions = this.processExtensions(extensions)
+          extensions.forEach(item => Object.assign(extension, item))
+          delete extension['@module']
           break
         case Type.Multiple:
         default:
-          extension = this.extensions
+          extension = extensions
+          extension = this.processExtensions(extension)
       }
-      this.preprocessors.forEach(processor => {
-        const result = processor.process(extension, this)
-        if (result !== null) {
-          extension = result
-        }
-      })
       this.extension = extension
-      if (this.type === Type.Multiple) {
-        this.extensions = extension
-      }
       this.processed = true
     }
+  }
+
+  private processExtensions(extensions: any[]) {
+    this.preprocessors.forEach(processor => {
+      let result = null
+      try {
+        result = processor.process(extensions, this)
+      } catch (error) {
+        // tslint:disable-next-line:no-console
+        console.error(error)
+      }
+      if (result !== null) {
+        extensions = result
+      }
+    })
+    return extensions
   }
 
 }

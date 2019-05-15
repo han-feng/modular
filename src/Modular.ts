@@ -74,8 +74,11 @@ export default class Modular {
   }
 
   /**
-   * 获取指定名称的有效扩展配置
+   * 获取指定名称的扩展配置对象
    * @param name 扩展点名称
+   * @returns 当扩展点类型为 Multiple 时，返回扩展配置对象数组；
+   *          当扩展点类型为 Single 时，返回最后加入的扩展配置对象；
+   *          当扩展点类型为 Mixin 时，返回所有扩展配置对象混合后的结果
    */
   getExtension(name: string) {
     const point = this.getExtensionPoint(name)
@@ -86,7 +89,8 @@ export default class Modular {
   }
 
   /**
-   * 获取扩展配置对象数组
+   * 获取原始配置对象数组，这些配置对象未经任何加工处理
+   * @param name 扩展点名称
    */
   getExtensions(name: string) {
     const point = this.getExtensionPoint(name)
@@ -248,9 +252,9 @@ export default class Modular {
         for (const name in ext) {
           if (points[name]) {
             if (points[name].type === Type.Multiple && Array.isArray(ext[name])) {
-              points[name].addExtension(...ext[name])
+              points[name].addExtension(module.name, ...ext[name])
             } else {
-              points[name].addExtension(ext[name])
+              points[name].addExtension(module.name, ext[name])
             }
           } else {
             this.log(new LogInfo('E06', 'error', { m: module, ep: name }))

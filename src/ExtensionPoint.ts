@@ -1,3 +1,5 @@
+import Modular from './Modular';
+
 /**
  * 扩展点类型，默认值为 array，可选值有以下几种：
  * array: 数组形式，支持多值，所有扩展配置都有效；
@@ -25,9 +27,9 @@ export interface Preprocessor {
   /**
    * 扩展配置预处理
    * @param extensions 待处理扩展配置对象数组
-   * @returns 处理后的扩展配置对象，对应于 DefaultExtensionPoint.getExtension() 方法的返回值
+   * @returns 处理后的扩展配置对象数组
    */
-  process(extensions: any[], extensionPoint: ExtensionPoint): any
+  process(extensions: any[], extensionPoint?: ExtensionPoint, modular?: Modular): any
 }
 
 /**
@@ -36,6 +38,7 @@ export interface Preprocessor {
 export class DefaultExtensionPoint implements ExtensionPoint {
   readonly type: string
   module?: string
+  modular?: Modular
   /**
    * 原始配置对象
    */
@@ -50,9 +53,10 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   private readonly preprocessors: Preprocessor[] = []
   private processed = false
 
-  constructor(point: ExtensionPoint) {
+  constructor(point: ExtensionPoint, modular: Modular) {
     this.type = point.type
     this.module = point.module
+    this.modular = modular
   }
 
   /**
@@ -124,7 +128,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
     this.preprocessors.forEach(processor => {
       let result = null
       try {
-        result = processor.process(extensions, this)
+        result = processor.process(extensions, this, this.modular)
       } catch (error) {
         // tslint:disable-next-line:no-console
         console.error(error)

@@ -231,7 +231,7 @@ export default class Modular {
           if (points[name]) {
             this.log(new LogInfo('E05', 'error', { m: module, ep: name }))
           } else {
-            const point = new DefaultExtensionPoint(ps[name])
+            const point = new DefaultExtensionPoint(ps[name], this)
             point.module = module.name
             points[name] = point
           }

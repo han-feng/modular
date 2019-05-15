@@ -1,4 +1,7 @@
-import Modular from './Modular';
+import Logger from 'js-logger'
+import Modular from './Modular'
+
+const logger = Logger.get('modular.core.ExtensionPoint')
 
 /**
  * 扩展点类型，默认值为 array，可选值有以下几种：
@@ -53,7 +56,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   private readonly preprocessors: Preprocessor[] = []
   private processed = false
 
-  constructor(point: ExtensionPoint, modular: Modular) {
+  constructor(point: ExtensionPoint, modular?: Modular) {
     this.type = point.type
     this.module = point.module
     this.modular = modular
@@ -130,8 +133,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
       try {
         result = processor.process(extensions, this, this.modular)
       } catch (error) {
-        // tslint:disable-next-line:no-console
-        console.error(error)
+        logger.error(error)
       }
       if (result !== null) {
         extensions = result

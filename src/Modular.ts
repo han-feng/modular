@@ -1,6 +1,9 @@
+import Logger from 'js-logger'
 import LogInfo from './LogInfo'
 import ModulesLoader from './ModulesLoader'
 import { ExtensionPoint, DefaultExtensionPoint, Type, Preprocessor } from './ExtensionPoint'
+
+const logger = Logger.get('modular.core.Modular')
 
 export interface Activator {
   start(modular: Modular, module: ModuleConfig): void
@@ -30,7 +33,7 @@ export interface ModularOptions {
  */
 export default class Modular {
   public readonly strict: boolean
-  // private inited: boolean = false
+  private inited: boolean = false
   private readonly logs: LogInfo[] = [] // 记录处理过程中产生的日志信息
   private application: ApplicationConfig
   private modules: ModuleConfig[]
@@ -147,11 +150,13 @@ export default class Modular {
    * 启动模块化应用
    */
   start() {
+    logger.debug('Modular starting ...')
     this.modules.forEach(module => {
       if (module.activator && module.activator.start) {
         module.activator.start(this, module)
       }
     })
+    logger.debug('Modular started')
   }
 
   /**
@@ -167,8 +172,7 @@ export default class Modular {
    */
   private log(info: LogInfo) {
     this.logs.push(info)
-    // tslint:disable-next-line:no-console
-    // console.log(info.toString())
+    logger.error(info)
   }
 
   /**
@@ -198,11 +202,12 @@ export default class Modular {
    * 初始化
    */
   private init() {
-    // if (this.inited) {
-    //   // 防止初始化两次
-    //   this.log(new LogInfo('E00', 'error'))
-    //   return
-    // }
+    if (this.inited) {
+      // 防止初始化两次
+      this.log(new LogInfo('E00', 'error'))
+      return
+    }
+    logger.debug('Modular init')
     const app = this.application
     let modules = this.modules
 
@@ -266,7 +271,7 @@ export default class Modular {
     this.application = Object.freeze(app) // 应用配置
     this.modules = Object.freeze(modules) as ModuleConfig[]
     this.extensionPoints = Object.freeze(points)
-    // this.inited = true
+    this.inited = true
   }
 
   /**

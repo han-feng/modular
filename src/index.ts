@@ -5,6 +5,7 @@
 export {
   Type as ExtensionPointType,
   ExtensionPoint,
+  Preprocessor,
   DefaultExtensionPoint
 } from './ExtensionPoint'
 

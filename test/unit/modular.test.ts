@@ -1,7 +1,11 @@
+import Logger from 'js-logger'
 import { default as Modular, ApplicationConfig } from '@/index'
 import LogInfo from '@/LogInfo'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
+
+Logger.useDefaults()
+const logger = Logger.get('modular.core.test')
 
 const application: ApplicationConfig = { name: 'Application' }
 
@@ -74,28 +78,21 @@ describe('Modular 单元测试', () => {
     //   ep5: data.ep5
     // })
     expect(modular.getExtension('ep1')).toEqual([
-      { m9: { name: 'm9-ext1' } },
-      { name: 'm10-ext1' },
-      { name: 'm10->m9-ext1' }
+      { '@module': 'm9', 'm9': { name: 'm9-ext1' } },
+      { '@module': 'm10', 'name': 'm10-ext1' },
+      { '@module': 'm10', 'name': 'm10->m9-ext1' }
     ])
-    expect(modular.getExtension('ep2')).toEqual([
-      {
-        m10: 'm10=ext2'
-      }
-    ])
+    expect(modular.getExtension('ep2')).toEqual([{ '@module': 'm10', 'm10': 'm10=ext2' }])
     expect(modular.getExtensions('ep1')).toEqual([
-      { m9: { name: 'm9-ext1' } },
-      { name: 'm10-ext1' },
-      { name: 'm10->m9-ext1' }
+      { '@module': 'm9', 'm9': { name: 'm9-ext1' } },
+      { '@module': 'm10', 'name': 'm10-ext1' },
+      { '@module': 'm10', 'name': 'm10->m9-ext1' }
     ])
-    expect(modular.getExtensions('ep2')).toEqual([
-      {
-        m10: 'm10=ext2'
-      }
-    ])
+    expect(modular.getExtensions('ep2')).toEqual([{ '@module': 'm10', 'm10': 'm10=ext2' }])
   })
 
   test('异常测试', () => {
+    logger.info('开始异常测试，下列输出的异常日志信息符合预期结果。')
     let modular = new Modular({
       modules: cloneDeep([
         data.m4,

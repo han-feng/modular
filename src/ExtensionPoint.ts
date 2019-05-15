@@ -1,3 +1,8 @@
+import Logger from 'js-logger'
+import Modular from './Modular'
+
+const logger = Logger.get('modular.core.ExtensionPoint')
+
 /**
  * 扩展点类型，默认值为 array，可选值有以下几种：
  * array: 数组形式，支持多值，所有扩展配置都有效；
@@ -24,10 +29,10 @@ export interface ExtensionPoint {
 export interface Preprocessor {
   /**
    * 扩展配置预处理
-   * @param extension 待处理扩展配置对象
-   * @returns 处理后的扩展配置对象，对应于 DefaultExtensionPoint.getExtension() 方法的返回值
+   * @param extensions 待处理扩展配置对象数组
+   * @returns 处理后的扩展配置对象数组
    */
-  process(extension: any, extensionPoint: DefaultExtensionPoint): any
+  process(extensions: any[], extensionPoint?: ExtensionPoint, modular?: Modular): any
 }
 
 /**
@@ -36,71 +41,51 @@ export interface Preprocessor {
 export class DefaultExtensionPoint implements ExtensionPoint {
   readonly type: string
   module?: string
-
-  private extensions: any[] = []
+  modular?: Modular
+  /**
+   * 原始配置对象
+   */
+  private readonly extensions: any[] = []
+  /**
+   * 处理过的配置对象
+   */
   private extension: any = {}
-  private preprocessors: Preprocessor[] = []
+  /**
+   * 预处理器
+   */
+  private readonly preprocessors: Preprocessor[] = []
   private processed = false
 
-  constructor(point: ExtensionPoint) {
+  constructor(point: ExtensionPoint, modular?: Modular) {
     this.type = point.type
     this.module = point.module
+    this.modular = modular
   }
 
   /**
    * 添加扩展
+   * @param module 扩展提供模块名称
    * @param extensions 扩展配置集合
    */
-  addExtension(...extensions: any[]) {
+  addExtension(module: string, ...extensions: any[]) {
     this.processed = false
+    extensions.forEach(item => item['@module'] = module)
     this.extensions.push(...extensions)
-    switch (this.type) {
-      case Type.Single:
-        this.extension = extensions[extensions.length - 1]
-        break
-      case Type.Mixin:
-        extensions.forEach(item => Object.assign(this.extension, item))
-        break
-      case Type.Multiple:
-      default:
-    }
   }
 
   /**
-   * 获取扩展
+   * 获取扩展配置对象
    * @returns 当扩展点类型为 Multiple 时，返回扩展配置对象数组；
    *          当扩展点类型为 Single 时，返回最后加入的扩展配置对象；
    *          当扩展点类型为 Mixin 时，返回所有扩展配置对象混合后的结果
    */
   getExtension() {
-    if (this.processed) {
-      return this.extension
-    } else {
-      let extension: any = null
-      switch (this.type) {
-        case Type.Single:
-        case Type.Mixin:
-          extension = this.extension
-          break
-        case Type.Multiple:
-        default:
-          extension = this.extensions
-      }
-      this.preprocessors.forEach(processor => {
-        const result = processor.process(extension, this)
-        if (result !== null) {
-          extension = result
-        }
-      })
-      this.extension = extension
-      this.processed = true
-      return extension
-    }
+    this.preprocess()
+    return this.extension
   }
 
   /**
-   * 获取全部扩展的原始配置对象，这些配置对象未进行预处理加工
-   * @deprecated
+   * 获取原始配置对象数组，这些配置对象未经任何加工处理
    */
   getExtensions() {
     return this.extensions
@@ -113,6 +98,48 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   addPreprocessors(...proprocessors: Preprocessor[]) {
     this.processed = false
     this.preprocessors.push(...proprocessors)
+  }
+
+  private preprocess() {
+    if (!this.processed) {
+      let extension: any = {}
+      let extensions = this.extensions
+      switch (this.type) {
+        case Type.Single:
+          extension = extensions[extensions.length - 1]
+          extensions = this.processExtensions([extension])
+          if (extensions && extensions.length && extensions.length > 0) {
+            extension = extensions[0]
+          }
+          break
+        case Type.Mixin:
+          extensions = this.processExtensions(extensions)
+          extensions.forEach(item => Object.assign(extension, item))
+          delete extension['@module']
+          break
+        case Type.Multiple:
+        default:
+          extension = extensions
+          extension = this.processExtensions(extension)
+      }
+      this.extension = extension
+      this.processed = true
+    }
+  }
+
+  private processExtensions(extensions: any[]) {
+    this.preprocessors.forEach(processor => {
+      let result = null
+      try {
+        result = processor.process(extensions, this, this.modular)
+      } catch (error) {
+        logger.error(error)
+      }
+      if (result !== null) {
+        extensions = result
+      }
+    })
+    return extensions
   }
 
 }

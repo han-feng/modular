@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/han-feng/modular.svg?branch=master)](https://travis-ci.org/han-feng/modular)
 ![GitHub package version](https://img.shields.io/github/package-json/v/han-feng/modular.svg)
-[![npm](https://img.shields.io/npm/v/modular-core.svg)](https://www.npmjs.com/package/modular-core)
+[![npm](https://img.shields.io/npm/v/modular-core.svg)](https://npm.im/modular-core)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=han-feng_modular&metric=ncloc)](https://sonarcloud.io/dashboard?id=han-feng_modular)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/han-feng/modular.svg)
 ![GitHub language count](https://img.shields.io/github/languages/count/han-feng/modular.svg)

@@ -49,7 +49,7 @@ export class DefaultExtensionPoint implements ExtensionPoint {
   /**
    * 处理过的配置对象
    */
-  private extension: any = {}
+  private extension: any = null
   /**
    * 预处理器
    */
@@ -102,25 +102,26 @@ export class DefaultExtensionPoint implements ExtensionPoint {
 
   private preprocess() {
     if (!this.processed) {
-      let extension: any = {}
+      let extension: any = null
       let extensions = this.extensions
-      switch (this.type) {
-        case Type.Single:
-          extension = extensions[extensions.length - 1]
-          extensions = this.processExtensions([extension])
-          if (extensions && extensions.length && extensions.length > 0) {
+      if (extensions && extensions.length && extensions.length > 0) {
+        switch (this.type) {
+          case Type.Single:
+            extension = extensions[extensions.length - 1]
+            extensions = this.processExtensions([extension])
             extension = extensions[0]
-          }
-          break
-        case Type.Mixin:
-          extensions = this.processExtensions(extensions)
-          extensions.forEach(item => Object.assign(extension, item))
-          delete extension['@module']
-          break
-        case Type.Multiple:
-        default:
-          extension = extensions
-          extension = this.processExtensions(extension)
+            break
+          case Type.Mixin:
+            extensions = this.processExtensions(extensions)
+            extension = {}
+            extensions.forEach(item => Object.assign(extension, item))
+            delete extension['@module']
+            break
+          case Type.Multiple:
+          default:
+            extension = extensions
+            extension = this.processExtensions(extension)
+        }
       }
       this.extension = extension
       this.processed = true

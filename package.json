@@ -49,6 +49,7 @@
     "gulp-typescript": "^5.0.1",
     "gulp-zip": "^5.0.1",
     "jest": "^25.2.7",
+    "kind-of": "^6.0.3",
     "pump": "^3.0.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.3.1",

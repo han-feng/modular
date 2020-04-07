@@ -4,7 +4,7 @@ import LogInfo from '@/LogInfo'
 import data from './modular.data'
 import { cloneDeep } from 'lodash'
 
-Logger.useDefaults()
+// Logger.useDefaults()
 const logger = Logger.get('modular.core.test')
 
 const application: ApplicationConfig = { name: 'Application' }

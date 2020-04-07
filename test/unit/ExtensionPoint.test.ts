@@ -1,5 +1,8 @@
+import Logger from 'js-logger'
 import { cloneDeep } from 'lodash'
 import { DefaultExtensionPoint, Type } from '@/ExtensionPoint'
+
+// Logger.useDefaults()
 
 describe('ExtensionPoint 单元测试', () => {
   test('Multiple 测试', () => {
@@ -36,6 +39,13 @@ describe('ExtensionPoint 单元测试', () => {
       }
     })
     expect(point.getExtension()).toEqual({ name: 'e0' })
+    // 预处理器异常测试，增加覆盖率
+    point.addPreprocessors({
+      process() {
+        throw { message: '这是一个正常的"异常"' }
+      }
+    })
+    point.getExtension()
   })
 
   test('Single 测试', () => {

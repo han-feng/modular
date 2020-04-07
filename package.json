@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "1.4.0",
+  "version": "1.4.1-SNAPSHOT",
   "description": "JavaScript application modular support",
   "author": "Han Feng <han_feng@foxmail.com>",
   "license": "MIT",
@@ -43,7 +43,7 @@
     "gulp-filter": "^6.0.0",
     "gulp-if": "^3.0.0",
     "gulp-license": "^1.1.0",
-    "gulp-load-plugins": "^2.0.2",
+    "gulp-load-plugins": "^2.0.3",
     "gulp-match": "^1.1.0",
     "gulp-terser": "^1.2.0",
     "gulp-typescript": "^5.0.1",

@@ -1,6 +1,6 @@
 {
   "name": "modular-core",
-  "version": "1.4.0-SNAPSHOT",
+  "version": "1.4.0",
   "description": "JavaScript application modular support",
   "author": "Han Feng <han_feng@foxmail.com>",
   "license": "MIT",

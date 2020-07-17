@@ -29,14 +29,14 @@
   },
   "dependencies": {
     "js-logger": "^1.6.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-env": "^7.10.4",
     "@types/jest": "^25.2.1",
-    "@types/lodash": "^4.14.149",
+    "@types/lodash": "^4.14.157",
     "babel-jest": "^25.2.6",
-    "chalk": "^4.0.0",
+    "chalk": "^4.1.0",
     "del": "^5.1.0",
     "dotgitignore": "^2.1.0",
     "gulp": "^4.0.2",
@@ -47,13 +47,13 @@
     "gulp-match": "^1.1.0",
     "gulp-terser": "^1.2.0",
     "gulp-typescript": "^5.0.1",
-    "gulp-zip": "^5.0.1",
+    "gulp-zip": "^5.0.2",
     "jest": "^25.2.7",
     "kind-of": "^6.0.3",
     "pump": "^3.0.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.3.1",
-    "tslint": "^6.1.1",
-    "typescript": "^3.8.3"
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.7"
   }
 }

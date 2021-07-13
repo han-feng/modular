@@ -20,6 +20,8 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/81ee4ea8619795c3df9f/test_coverage)](https://codeclimate.com/github/han-feng/modular/test_coverage)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/aaaecaba7c4c4b559741b37704ec8f82)](https://www.codacy.com/app/han-feng/modular?utm_source=github.com&utm_medium=referral&utm_content=han-feng/modular&utm_campaign=Badge_Coverage)
 
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/han-feng/modular)
+
 ## License
 
 [![作者](https://img.shields.io/badge/%E4%BD%9C%E8%80%85-han__feng%40foxmail.com-red.svg?style=social&logo=github)](mailto:han_feng@foxmail.com)

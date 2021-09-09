@@ -1,8 +1,10 @@
+import Logger from 'js-logger'
 import Modular from '@/index'
 import LogInfo from '@/LogInfo'
 import data from './modular.data.js'
 import { cloneDeep } from 'lodash'
 
+// Logger.useDefaults()
 const application = { name: 'Application' }
 
 describe('Modular 单元测试', () => {

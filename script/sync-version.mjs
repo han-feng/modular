@@ -5,8 +5,10 @@
  * 2、未指定 version 参数时，读取 package.json 中 version 的值，更新 sonar-project.properties 文件中的版本号
  * 该脚本设计为在 package.json 中 scripts 配置，并使用 node 执行。该脚本应放置于 script（或scripts）目录中。
  */
-const fs = require('fs')
-const chalk = require('chalk')
+import chalk from 'chalk'
+import fs from 'fs'
+// const fs = require('fs')
+// const chalk = require('chalk')
 const sonarPath = 'sonar-project.properties'
 
 let version = process.argv[2] // 第一个命令行参数是要设置的版本号，可选
@@ -25,7 +27,7 @@ if (!version) {
 
 if (!fs.existsSync(sonarPath)) {
   console.log(chalk.yellow('skipped: sonar-project.properties'))
-  return
+  process.exit(0)
 }
 const sonarFile = fs.readFileSync(sonarPath, 'utf8')
 
